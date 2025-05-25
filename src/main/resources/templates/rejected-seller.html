@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Rejected Sellers</title>
+</head>
+<body>
+<h2>All Rejected Sellers List</h2>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Shop Name</th>
+    <th>Address</th>
+    <th>Approved</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="seller : ${rejectedSellers}">
+    <td th:text="${seller.name}">Name</td>
+    <td th:text="${seller.email}">Email</td>
+    <td th:text="${seller.phone}">Phone</td>
+    <td th:text="${seller.shopname}">Shop</td>
+    <td th:text="${seller.address}">Address</td>
+    <td th:text="${seller.approved}">Approved</td>
+    <td th:text="${seller.rejected}">Rejected</td>
+  </tr>
+  </tbody>
+</table>
+
+<a th:href="@{/admin/pending-sellers}">
+  <button>Back to Pending Sellers</button>
+</a>
+
+</body>
+</html>

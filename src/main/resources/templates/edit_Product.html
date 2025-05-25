@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="/css/inventory.css">
+    <link rel="icon" href="/images/default-favicon.ico" type="image/x-icon">
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        
+
+        .form-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h1 {
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #2563eb;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 95%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: #f9fafb;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #2563eb;
+            outline: none;
+            background-color: #fff;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: #f9fafb;
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.3s, background-color 0.3s;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23555" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        select:focus {
+            border-color: #2563eb;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .upload-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 2px dashed #2563eb;
+            border-radius: 6px;
+            background-color: #f9fafb;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .upload-box:hover {
+            background-color: #eef6ff;
+            border-color: #1e40af;
+        }
+
+        .upload-box span {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .current-images img {
+        width: 100px; 
+        height: 100px; 
+        object-fit: cover; 
+        border-radius: 6px; 
+    }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #10b981;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #059669;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .cancel-btn {
+            background-color: #f87171;
+        }
+
+        .cancel-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .btn {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="form-container">
+    <h1>Edit Product</h1>
+    <form method="post" th:action="@{/inventory/update/{id}(id=${product.id})}" onsubmit="return validateForm()" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Product Name</label>
+            <input type="text" id="name" name="name" th:value="${product.name}" required="required" />
+        </div>
+
+        <div class="form-group">
+            <label for="category">Product Category</label>
+            <select id="category" name="category" th:value="${product.category}" required="required">
+                <option value="" disabled>Select a category</option>
+                <option value="Electronics" th:selected="${product.category == 'Electronics'}">Electronics</option>
+                <option value="Fashion" th:selected="${product.category == 'Fashion'}">Fashion</option>
+                <option value="Home & Kitchen" th:selected="${product.category == 'Home & Kitchen'}">Home & Kitchen</option>
+                <option value="Sports" th:selected="${product.category == 'Sports'}">Sports</option>
+                <option value="Books" th:selected="${product.category == 'Books'}">Books</option>
+                <option value="Other" th:selected="${product.category == 'Other'}">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" name="quantity" th:value="${product.quantity}" />
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" th:value="${product.price}" />
+        </div>
+
+        <div class="form-group">
+            <label for="discountPercentage">Discount</label>
+            <input type="number" id="discountPercentage" name="discountPercentage" th:value="${product.discountPercentage}" />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" th:text="${product.description}" ></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="images">Upload New Images (optional):</label>
+            <input type="file" id="images" name="images" multiple />
+            <div class="upload-box">
+                <span>Click or Drag files here to upload</span>
+            </div>
+            <p>Current Images:</p>
+            <div class="current-images">
+                <div th:each="imageUrl : ${product.imageUrls}">
+                    <img th:src="@{${imageUrl}}" alt="Product Image" />
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button type="submit" class="btn">Update Product</button>
+            <button type="button" class="btn cancel-btn" onclick="cancelForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+ <script type="text/javascript">
+        function validateForm() {
+            var productName = document.getElementById("name").value;
+            var category = document.getElementById("category").value;
+            var quantity = document.getElementById("quantity").value;
+            var price = document.getElementById("price").value;
+            var discountPercentage = document.getElementById("discountPercentage").value;
+            var description = document.getElementById("description").value;
+            var isValid = true;
+
+            if (productName == "") {
+                isValid = false;
+                alert("Product Name is Empty");
+            } else if (category == "") {
+                isValid = false;
+                alert("Category is Empty");
+            } else if (quantity == "") {
+                isValid = false;
+                alert("Quantity is Empty");
+            } else if (price == "") {
+                isValid = false;
+                alert("Price is Empty");
+            } else if (discountPercentage == "") {
+                isValid = false;
+                alert("Discount is Empty");
+            }else if(description == ""){
+            isValid=false;
+            alert("Description is Empty");
+}
+            
+
+            return isValid;
+        }
+
+    function cancelForm() {
+        if (confirm("Are you sure you want to cancel? Unsaved changes will be lost.")) {
+            window.location.href = "/inventory";
+        }
+    }
+</script>
+
+</body>
+</html>

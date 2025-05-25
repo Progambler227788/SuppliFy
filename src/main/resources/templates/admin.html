@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sellers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .approve-button, .reject-button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 5px; /* Space between buttons */
+        }
+        .approve-button:hover {
+            background-color: #45a049;
+        }
+        .reject-button {
+            background-color: #f44336; /* Red */
+        }
+        .reject-button:hover {
+            background-color: #e53935;
+        }
+        .rejected {
+            background-color: #ffcccc; /* Light red for rejected sellers */
+        }
+    </style>
+</head>
+<body>
+
+<h2>Pending Sellers List</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Shop Name</th>
+        <th>Address</th>
+        <th>Action</th> <!-- New column for actions -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Display Pending Sellers -->
+    <tr th:each="seller : ${pendingSellers}">
+        <td th:text="${seller.name}"></td>
+        <td th:text="${seller.email}"></td>
+        <td th:text="${seller.phone}"></td>
+        <td th:text="${seller.shopname}"></td>
+        <td th:text="${seller.address}"></td>
+        <td>
+            <form th:action="@{/admin/approve-seller/{id}(id=${seller.id})}" method="post" style="display:inline;">
+                <button type="submit" class="approve-button">Approve</button>
+            </form>
+<!--            <button class="reject-button" onclick="rejectSeller('${seller.id}')">Reject</button>        </td>-->
+
+            <form th:action="@{/admin/reject-seller/{id}(id=${seller.id})}" method="post" style="display:inline;">
+                <button type="submit" class="reject-button">reject</button>
+            </form>
+    </tr>
+
+    <!-- Display Rejected Sellers -->
+    <tr th:each="seller : ${rejectedSellers}" class="rejected">
+        <td th:text="${seller.name}"></td>
+        <td th:text="${seller.email}"></td>
+        <td th:text="${seller.phone}"></td>
+        <td th:text="${seller.shopname}"></td>
+        <td th:text="${seller.address}"></td>
+        <td>Rejected</td>
+    </tr>
+    </tbody>
+</table>
+<button onclick="window.location.href='/admin/all-sellers'">Show All Sellers</button>
+<button onclick="window.location.href='/admin/rejected-sellers'">Show Rejected Sellers</button>
+<script>
+    async function rejectSeller(sellerId) {
+        try {
+            const response = await fetch(`http://localhost:9098/admin/reject-seller/${sellerId}`, {
+                method: "PUT",
+            });
+            if (response.ok) {
+                alert("Seller rejected successfully!");
+                location.reload(); // Refresh the page to see the updated list
+            } else {
+                alert("Error rejecting seller");
+            }
+        } catch (error) {
+            console.error("Error rejecting seller:", error);
+        }
+    }
+</script>
+
+</body>
+</html>

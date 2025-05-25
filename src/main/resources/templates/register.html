@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Registration</title>
+    
+        <style>
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #10b981;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --white: #ffffff;
+    --error-color: #ef4444;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(16, 185, 129, 0.1));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    color: var(--text-dark);
+}
+
+.registration-container {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-header h1 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-header p {
+    color: var(--text-muted);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 90% ;
+    padding: 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background-color: #f9fafb;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+
+.login-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.show-password-container {
+    position: relative;
+}
+
+#togglePassword {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 0.7rem;
+    color: black;
+}
+        
+        
+        </style>
+        
+        
+    
+    
+</head>
+<body>
+    <div class="registration-container">
+        <div class="form-header">
+            <h1>Create Your Account</h1>
+            <p>Please fill in the details below to register.</p>
+        </div>
+        <form method="post" th:action="@{/register/save}" th:object="${user}" onsubmit="return validateForm()" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label" for="firstName">First Name</label>
+                <input type="text" id="firstName" th:field="*{firstName}" class="form-control" placeholder="First Name">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="lastName">Last Name</label>
+                <input type="text" id="lastName" th:field="*{lastName}" class="form-control" placeholder="Last Name" >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="phone">Phone Number</label>
+                <input type="text" id="phone" th:field="*{phone}" class="form-control" placeholder="Phone Number" >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="shopName">Shop Name</label>
+                <input type="text" id="shopName" th:field="*{shopName}" class="form-control" placeholder="Shop Name">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="address">Address</label>
+                <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="Address">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="zipcode">Zip Code</label>
+                <input type="text" id="zipcode" th:field="*{zipcode}" class="form-control" placeholder="Zip Code" >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="images">Upload Documents</label>
+                <input type="file" id="images" th:field="*{images}" class="form-control">
+            </div>
+             <div class="form-group">
+                <label class="form-label" for="password">Password:</label>
+                <div class="show-password-container">
+                    <input type="password" id="password" th:field="*{password}" placeholder="Password" class="form-control" />
+                    <span id="togglePassword">👁️</span> <!-- Simple lock icon -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="confirmpassword">Confirm Password</label>
+                <input type="password" id="confirmpassword" th:field="*{confirmpassword}" class="form-control" placeholder="Confirm Password">
+            </div>
+            <button type="submit" class="submit-btn">Register</button>
+        </form>
+        <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+        <div class="login-link">
+            <p>Already have an account? <a href="/login">Login here</a></p>
+        </div>
+    </div>
+    <script>
+     function validateForm() {
+            var firstname = document.getElementById("firstname").value;
+            var lastname = document.getElementById("lastname").value;
+            var email = document.getElementById("email").value;
+            var phone = document.getElementById("phone").value;
+            var shopname = document.getElementById("shopname").value;
+            var address = document.getElementById("address").value;
+            var zipcode = document.getElementById("zipcode").value;
+           var password = document.getElementById("password").value;
+           var confirmpassword = document.getElementById("confirmpassword").value;
+            var isValid = true;
+
+            if (firstname == "") {
+                isValid = false;
+                alert("first Name is Empty");
+            } else if (lastname == "") {
+                isValid = false;
+                alert("last Name is Empty");
+            } else if (email == "") {
+                isValid = false;
+                alert("Email is Empty");
+            } else if (phone == "") {
+                isValid = false;
+                alert("Phone number is Empty");
+            } else if (shopname == "") {
+                isValid = false;
+                alert("Shop Name is Empty");
+            }else if(address == ""){
+                isValid=false;
+                alert("Address is Empty");
+            }else if(zipcode == ""){
+                isValid=false;
+                alert("ZipCode is Empty");
+            }else if(password == ""){
+                isValid=false;
+                alert("Password is Empty");
+           } else if(confirmpassword == ""){
+                isValid=false;
+                alert("Confirm Password is Empty");
+            }
+
+            return isValid;
+        }
+        
+         document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordField = document.getElementById("password");
+        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+        passwordField.setAttribute("type", type);
+        this.textContent = type === "password" ? "👁️" : "🔒";
+    });
+        
+        </script>
+    
+</body>
+</html>

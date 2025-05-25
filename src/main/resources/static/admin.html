@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User Management</title>
+    <style>
+    <!--    body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .actions button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .approve-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .reject-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+
+    <script>
+        // Fetch pending sellers from backend
+     function loadPendingSellers() {
+        fetch("http://localhost:9098/admin/pending-sellers")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch sellers");
+                }
+                return response.json();
+            })
+            .then(sellers => {
+                const tableBody = document.getElementById("pendingSellers");
+                tableBody.innerHTML = "";  // Clear table before adding new data
+
+                sellers.forEach(seller => {
+                    const row = `<tr>
+                        <td>${seller.name}</td>
+                        <td>${seller.email}</td>
+                        <td>${seller.shopname}</td>  <!-- Fixed field name -->
+                        <td>${seller.approved ? "Approved" : "Pending"}</td>
+                        <td>
+                            ${seller.approved ?
+                                `<span style="color: green;">Approved</span>` :
+                                `<button class="approve-btn" onclick="approveSeller('${seller.id}')">Approve</button>
+                                 <button class="reject-btn" onclick="rejectSeller('${seller.id}')">Reject</button>`
+                            }
+                        </td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            })
+            .catch(error => console.error("Error loading sellers:", error));
+    }
+
+    window.onload = loadPendingSellers;
+        // Approve a seller
+        function approveSeller(id) {
+            fetch(`/admin/approve-seller/${id}`, {
+                method: "PUT"
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadPendingSellers(); // Refresh list
+            })
+            .catch(error => console.error("Error approving seller:", error));
+        }
+
+        // Reject a seller
+        function rejectSeller(id) {
+            fetch(`/admin/reject-seller/${id}`, {
+                method: "PUT"
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadPendingSellers(); // Refresh list
+            })
+            .catch(error => console.error("Error rejecting seller:", error));
+        }
+
+        // Search function
+        function searchUsers() {
+            let input = document.querySelector(".search-box").value.toLowerCase();
+            let rows = document.querySelectorAll("#pendingSellers tr");
+
+            rows.forEach(row => {
+                let text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        // Load pending sellers on page load
+        window.onload = loadPendingSellers;
+    </script>-->
+</head>
+<body>
+
+<div class="container">
+    <h1>Admin - Approve & Reject Sellers</h1>
+
+    <input type="text" class="search-box" placeholder="Search users..." onkeyup="searchUsers()">
+
+    <h2>Pending Approvals</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Shop Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="pendingSellers">
+        <!-- Pending sellers will be loaded here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

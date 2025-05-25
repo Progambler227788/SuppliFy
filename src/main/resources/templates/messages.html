@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            color: #212529;
+        }
+
+        .message-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .contacts-list {
+            flex: 1;
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #495057;
+        }
+
+        .contacts-list h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid #495057;
+            padding-bottom: 10px;
+        }
+
+        .contacts-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-item {
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            background-color: #495057;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .contact-item:hover {
+            background-color: #6c757d;
+        }
+
+        .contact-item span {
+            font-size: 14px;
+            display: block;
+        }
+
+        .chat-box {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-left: 1px solid #e0e0e0;
+        }
+
+        .chat-box h3 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #343a40;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-sent, .message-received {
+            display: flex;
+            margin-bottom: 12px;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .message-sent {
+            align-items: flex-end;
+        }
+
+        .message-received {
+            align-items: flex-start;
+        }
+
+        .message-sent p, .message-received p {
+            padding: 12px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+
+        .message-sent p {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .message-received p {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            align-self: flex-end; /* Align timestamp to the right */
+        }
+
+        /* Sent message timestamp */
+        .sent-timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+            align-self: flex-end; /* Align to the right */
+        }
+
+        /* Received message timestamp */
+        .received-timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-align: left;
+            align-self: flex-start; /* Align to the left */
+        }
+
+        .seen-status-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .seen-status {
+            font-size: 12px;
+            color: #28a745;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .seen-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .message-sent .message-content, .message-received .message-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .message-sent .seen-status-container,
+        .message-received .seen-status-container {
+            margin-top: 2px;
+        }
+
+        .message-sent .sent-timestamp,
+        .message-received .sent-timestamp {
+            color: #999;
+            font-size: 12px;
+            margin-left: 0;
+            text-align: right;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            min-height: 50px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="message-container">
+    <!-- Contacts Section -->
+    <div class="contacts-list">
+        <h3>Conversations</h3>
+        <ul>
+            <!-- Loop through contacts -->
+            <li th:each="user : ${contacts}" class="contact-item" th:data-id="${user.id}" th:id="${user.id}"
+                th:title="${user.name}" onclick="selectConversation(this)">
+                <span th:text="${user.name}"></span>
+                <span th:text="${user.role}"></span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Chat Box Section -->
+    <div class="chat-box">
+        <h3 id="activeContactName">Chat</h3>
+        <div class="messages" id="messageList">
+            <div class="center-message" id="centerMessage">
+                Please select a contact to show its messages.
+            </div>
+        </div>
+        <form id="messageForm">
+            <input type="hidden" id="senderId" name="senderId" th:value="${currentUserId}">
+            <input type="hidden" id="receiverId" name="receiverId" th:value="${selectedContactId}">
+            <textarea id="messageContent" name="content" placeholder="Type your message..." required disabled></textarea>
+            <button type="submit" disabled>Send</button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        try {
+            const selectedContactId = '[[${SelectedContactId}]]';
+            const selectedContactName = '[[${SelectedContactName}]]';
+
+            if (!selectedContactId || !selectedContactName) {
+                setDefaultState();
+            } else {
+                initializeChat(selectedContactId, selectedContactName);
+            }
+        } catch (error) {
+            console.error("An error occurred: ", error);
+        }
+    });
+
+    function setDefaultState() {
+        document.getElementById('activeContactName').textContent = 'Please select a contact to start chatting';
+        document.getElementById('messageForm').querySelector('button').disabled = true;
+        document.querySelector('.contacts-list').style.display = 'block';
+    }
+
+    function initializeChat(contactId, contactName) {
+        document.getElementById('activeContactName').textContent = contactName;
+        document.getElementById('receiverId').value = contactId;
+        loadMessages(contactId);
+        document.querySelector('.contacts-list').style.display = 'none';
+        enableChatElements();
+        markMessagesAsSeen(contactId);
+    }
+
+    function selectConversation(element) {
+        const activeContactName = element.querySelector("span:nth-child(2)").textContent;
+        document.getElementById('activeContactName').textContent = activeContactName;
+
+        const contactId = element.getAttribute('data-id');
+        document.getElementById('receiverId').value = contactId;
+
+        loadMessages(contactId);
+        enableChatElements();
+
+        markMessagesAsSeen(contactId);
+    }
+
+    function enableChatElements() {
+        document.getElementById('messageForm').querySelector('button').disabled = false; // Enable Send button
+        document.getElementById('messageContent').disabled = false; // Enable textarea
+    }
+
+    function loadMessages(userId) {
+        const url = `/messages/user/${userId}`;
+
+        fetch(url)
+            .then(response => handleFetchResponse(response))
+            .then(data => displayMessages(data))
+            .catch(error => handleErrorLoadingMessages(error));
+    }
+
+    function handleFetchResponse(response) {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    }
+
+    function displayMessages(data) {
+         const messageList = document.getElementById('messageList');
+        messageList.innerHTML = '';
+
+        if (data && data.length > 0) {
+            data.forEach(message => appendMessage(message, messageList));
+        } else {
+            messageList.innerHTML = '<p>No messages yet. Start a conversation!</p>';
+        }
+
+        messageList.scrollTop = messageList.scrollHeight;
+
+    }
+
+
+     function appendMessage(message, messageList) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add(
+        message.senderId === document.getElementById('senderId').value
+            ? 'message-sent'
+            : 'message-received'
+    );
+
+    let seenStatusHTML = '';
+    if (message.senderId === document.getElementById('senderId').value && message.seen) {
+        const seenTime = new Date(message.seenTime);
+        const formattedTime = seenTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        const today = new Date();
+        const isToday = seenTime.toDateString() === today.toDateString();
+
+        if (isToday) {
+            seenStatusHTML = `
+                <div class="seen-status-container">
+                    <span class="seen-status">Seen</span>
+                    <span class="seen-time">${formattedTime}</span>
+                </div>
+            `;
+        } else {
+            const formattedDate = seenTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+            seenStatusHTML = `
+                <div class="seen-status-container">
+                    <span class="seen-status">Seen</span>
+                    <span class="seen-time">${formattedDate} at ${formattedTime}</span>
+                </div>
+            `;
+        }
+    }
+
+    const sentTimestampHTML = `
+        <span class="sent-timestamp">Sent at ${new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+    `;
+
+    const receivedTimestampHTML = `
+        <span class="received-timestamp">${new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+    `;
+
+    messageElement.innerHTML = `
+        <p>${message.content}</p>
+        ${message.senderId === document.getElementById('senderId').value ? sentTimestampHTML : receivedTimestampHTML}
+        ${seenStatusHTML}
+    `;
+
+    messageList.appendChild(messageElement);
+}
+
+
+
+    function handleErrorLoadingMessages(error) {
+        console.error("Error loading messages:", error);
+        const messageList = document.getElementById('messageList');
+        messageList.innerHTML = `<p class="error-message">Unable to load messages. Please try again later.</p>`;
+    }
+
+    document.getElementById('messageForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const messageContent = document.getElementById('messageContent').value;
+        const senderId = document.getElementById('senderId').value;
+        const receiverId = document.getElementById('receiverId').value;
+
+        sendMessage(messageContent, senderId, receiverId);
+    });
+
+    function sendMessage(content, senderId, receiverId) {
+        const messageData = { content, senderId, receiverId };
+
+        fetch('/messages/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messageData)
+        })
+            .then(response => handleSendMessageResponse(response))
+            .catch(error => handleErrorSendingMessage(error));
+    }
+
+
+   function handleSendMessageResponse(response) {
+        return response.json().then((data) => {
+            displaySentMessage(data);
+            loadMessages(data.receiverId);
+
+            });
+        }
+
+
+    function handleErrorSendingMessage(error) {
+        console.error("Error sending message:", error);
+        alert("There was an error sending the message. Please try again.");
+    }
+
+
+
+   function displaySentMessage(data) {
+    document.getElementById('messageContent').value = '';
+
+    const messageList = document.getElementById('messageList');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message-sent');
+    messageElement.innerHTML = `
+        <div class="message-content">
+            <p>${data.content}</p>
+            <div class="sent-timestamp">${new Date().toLocaleTimeString('en-US')}</div>
+        </div>
+    `;
+    messageList.appendChild(messageElement);
+
+    messageList.scrollTop = messageList.scrollHeight;
+}
+
+
+
+
+    function markMessagesAsSeen(contactId) {
+        const messageList = document.getElementById('messageList');
+        const messages = messageList.querySelectorAll('.message-received, .message-sent');
+
+
+        messages.forEach(message => {
+            const messageId = message.getAttribute('data-message-id');
+            if (messageId && !message.querySelector('.seen-status')) {
+                fetch(`/messages/seen/${messageId}`, {
+                    method: 'PUT',
+                })
+                .then(response => response.json())
+                .then(() => loadMessages(contactId))
+                .catch(error => console.error('Error marking message as seen:', error));
+            }
+    });
+}
+
+</script>
+
+
+</body>
+</html>

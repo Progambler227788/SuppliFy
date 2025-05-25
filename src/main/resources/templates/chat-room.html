@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chat Room</title>
+</head>
+<body>
+<h1>Chat Room</h1>
+
+<div>
+    <h2>Messages</h2>
+    <ul>
+        <li th:each="message : ${messages}">
+            <strong th:text="${message.sender}">Sender</strong>:
+            <span th:text="${message.content}">Message content</span>
+            <br/>
+            <small th:text="${message.timestamp}">Timestamp</small>
+        </li>
+    </ul>
+</div>
+
+<form th:action="@{/chat/{chatRoomId}/send(chatRoomId=${chatRoomId})}" method="post">
+    <input type="text" name="sender" placeholder="Your name" required />
+    <textarea name="content" placeholder="Enter your message" required></textarea>
+    <button type="submit">Send Message</button>
+</form>
+
+<a th:href="@{/chat/{chatRoomId}(chatRoomId=${chatRoomId})}">Back to Chat Room</a>
+</body>
+</html>
