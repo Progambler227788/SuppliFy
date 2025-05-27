@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class SellerController {
 	            return "redirect:/login";
 	        }
 
-	        Seller seller = sellerService.findUserByEmail(principal.getName());
+	        Seller seller = sellerService.findSellerByEmail(principal.getName());
 	        
 	        if (seller == null) {
 	            logger.error("No seller found for user: {}", principal.getName());
@@ -80,7 +79,7 @@ public class SellerController {
 
 	    logger.info("Received SellerDto: {}", userDto);
 
-	    Seller existingUser = sellerService.findUserByEmail(userDto.getEmail());
+	    Seller existingUser = sellerService.findSellerByEmail(userDto.getEmail());
 	    if (existingUser != null) {
 	        result.rejectValue("email", null, "An account with this email already exists");
 	    }
@@ -116,7 +115,7 @@ public class SellerController {
 	            return "redirect:/login";
 	        }
 
-	        Seller seller = sellerService.findUserByEmail(principal.getName());
+	        Seller seller = sellerService.findSellerByEmail(principal.getName());
 	        
 	        if (seller == null) {
 	            logger.error("No seller found for user: {}", principal.getName());
@@ -142,7 +141,7 @@ public class SellerController {
 	            return "redirect:/login";
 	        }
 
-	        Seller seller = sellerService.findUserByEmail(principal.getName());
+	        Seller seller = sellerService.findSellerByEmail(principal.getName());
 	        
 	        if (seller == null) {
 	            logger.error("No seller found for user: {}", principal.getName());
@@ -179,7 +178,7 @@ public class SellerController {
 	    if (result.hasErrors()) {
 	        logger.error("Validation errors: {}", result.getAllErrors());
 	        
-	        Seller existingSeller = sellerService.findUserByEmail(principal.getName());
+	        Seller existingSeller = sellerService.findSellerByEmail(principal.getName());
 	        model.addAttribute("seller", existingSeller);
 	        
 	        model.addAttribute("user", userDto);
@@ -188,7 +187,7 @@ public class SellerController {
 
 	    if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
 	        if (!userDto.isPasswordMatching()) {
-	            Seller existingSeller = sellerService.findUserByEmail(principal.getName());
+	            Seller existingSeller = sellerService.findSellerByEmail(principal.getName());
 	            model.addAttribute("seller", existingSeller);
 	            
 	            result.rejectValue("confirmpassword", null, "Passwords do not match");
@@ -203,7 +202,7 @@ public class SellerController {
 	    } catch (Exception e) {
 	        logger.error("Error updating profile", e);
 	        
-	        Seller existingSeller = sellerService.findUserByEmail(principal.getName());
+	        Seller existingSeller = sellerService.findSellerByEmail(principal.getName());
 	        model.addAttribute("seller", existingSeller);
 	        
 	        model.addAttribute("errorMessage", "Profile update failed: " + e.getMessage());

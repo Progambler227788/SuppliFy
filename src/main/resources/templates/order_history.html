@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order History - SuppliFy</title>
+  <link rel="stylesheet" href="/css/order_history.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="order-history-container">
+  <header class="order-header">
+    <h1>Your Order History</h1>
+    <a th:href="@{/buyerdashboard}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </header>
+
+  <div class="order-list">
+    <div th:if="${orders.empty}" class="no-orders">
+      <i class="fas fa-box-open"></i>
+      <p>You haven't placed any orders yet.</p>
+      <a th:href="@{/products}" class="shop-button">Start Shopping</a>
+    </div>
+
+    <div th:each="order : ${orders}" class="order-card">
+      <div class="order-header">
+        <div class="order-info">
+          <span class="order-id">Order #<span th:text="${order.id}"></span></span>
+          <span class="order-date" th:text="${#temporals.format(order.orderDate, 'MMMM dd, yyyy hh:mm a')}"></span>
+        </div>
+        <div class="order-status" th:classappend="${order.status.toLowerCase()}">
+          <span th:text="${order.status}"></span>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <div class="product-info">
+          <img th:src="${order.product.imageUrls != null && !order.product.imageUrls.empty} ?
+                             ${order.product.imageUrls[0]} : '/images/default-product.jpg'"
+               alt="Product Image" class="product-image">
+          <div class="product-details">
+            <h3 th:text="${order.product.name}"></h3>
+            <p class="quantity">Quantity: <span th:text="${order.quantity}"></span></p>
+          </div>
+        </div>
+        <div class="order-total">
+          <span>Total:</span>
+          <span class="amount" th:text="${'$' + #numbers.formatDecimal(order.totalAmount, 1, 2)}"></span>
+        </div>
+      </div>
+
+      <div class="order-actions">
+        <a th:href="@{/orders/details/{id}(id=${order.id})}" class="view-details">
+          View Details <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

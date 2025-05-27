@@ -8,14 +8,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.supplify.dto.SellerDto;
 import com.supplify.entity.Role;
 import com.supplify.entity.Seller;
 import com.supplify.repository.RoleRepository;
 import com.supplify.repository.SellerRepository;
 import com.supplify.services.SellerService;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +27,7 @@ public class SellerServiceImpl implements SellerService {
 
 	@Autowired
     private SellerRepository sellerRepository;
+
     @Autowired
     private RoleRepository roleRepository;
     
@@ -80,12 +79,7 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public Seller findUserByEmail(String email) { 
-        return sellerRepository.findByEmail(email);
-    }
-
-    @Override
-    public Seller findByEmail(String email) {
+    public Seller findSellerByEmail(String email) {
         return sellerRepository.findByEmail(email);
     }
 
@@ -195,7 +189,7 @@ public class SellerServiceImpl implements SellerService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName(); // Assuming the email is the username
-            return findUserByEmail(email);
+            return findSellerByEmail(email);
         }
         return null; // Return null if no user is authenticated
     }
@@ -206,36 +200,7 @@ public class SellerServiceImpl implements SellerService {
         return sellerRepository.findById(id).orElse(null);
 
     }
-   /* @Override
-    public void approveSeller(UUID id) {
-        Seller seller = findById(id);
-        if (seller != null) {
-            seller.setApproved(true);
-            userRepository.save(seller);
-        }
-    }*/
-    /*@Override
-    public void save(Seller seller) {
-        userRepository.save(seller);  // Save seller entity
-    }
-    @Override
-    public List<Seller> getPendingSellers() {
-        return userRepository.findByApprovedFalse();
-    }
 
-
-    @Override
-    public void approveSeller(UUID id) {
-        userRepository.findById(id).ifPresent(seller -> {
-            seller.setApproved(true);
-            userRepository.save(seller);
-        });
-    }
-
-    @Override
-    public void rejectSeller(UUID id) {
-        userRepository.deleteById(id);
-    }*/
    public List<Seller> getPendingSellers() {
        return sellerRepository.findByIsApprovedFalseAndIsRejectedFalse();
    }

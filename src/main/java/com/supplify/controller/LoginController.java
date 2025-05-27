@@ -1,6 +1,8 @@
 package com.supplify.controller;
 
+import com.supplify.dto.SellerDto;
 import com.supplify.services.ServiceProviderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,9 +19,11 @@ import com.supplify.services.SellerService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.util.List;
 
 
 @Controller
+@Slf4j
 public class LoginController {
 
 	@Autowired
@@ -43,12 +47,23 @@ public class LoginController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
-            Seller seller = sellerService.findByEmail(email);
+
+            // Check if the user is a Seller or Buyer
+
+            System.out.println("===== LOGIN ATTEMPT =====");
+            System.out.println("Username/Email attempted: " + username);
+
+            System.out.println("===== ALL SELLERS =====");
+            List<SellerDto> sellers = sellerService.findAllUsers();
+            sellers.forEach(seller -> System.out.println(seller.getEmail()));
+
+            Seller seller = sellerService.findSellerByEmail(email);
             Buyer buyer = buyerService.findBuyerByEmail(email);
 //            ServiceProviderService sp = serviceProviderService.findServiceProviderByEmail(email);
             if (seller != null) {
                 return "redirect:/sellerdashboard";
-            } else if (buyer != null) {
+            }
+            else if (buyer != null) {
                 return "redirect:/buyerdashboard";
             }
         }

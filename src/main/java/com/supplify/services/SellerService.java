@@ -11,9 +11,9 @@ import com.supplify.entity.Seller;
 
 public interface SellerService {
     void saveUser (SellerDto sellerDto, MultipartFile[] images) throws IOException;
-    Seller findUserByEmail(String email );
+    Seller findSellerByEmail(String email );
 
-    Seller findByEmail(String email);
+
     List<SellerDto> findAllUsers();
     Seller getLoggedInUser();
     void updateSellerProfile(SellerDto sellerDto, MultipartFile[] images) throws IOException;
