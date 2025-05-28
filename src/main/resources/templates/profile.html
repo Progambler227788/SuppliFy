@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Profile - SuppliFy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
+    
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">SuppliFy</a>
+            <div class="navbar-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="navbar-nav">
+                <li><a href="/buyerdashboard" class="nav-link">Home</a></li>
+                <li><a href="#" class="nav-link">Products</a></li>
+                <li><a href="#" class="nav-link">Cart</a></li>
+                <li><a href="/profile" class="nav-link active">Profile</a></li>
+                <li><a th:href="@{/logout}" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="profile-container">
+            <!-- Profile Sidebar -->
+            <div class="profile-sidebar slide-in-left">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <h2 th:text="${buyer.firstName + ' ' + buyer.lastName}">John Doe</h2>
+                        <p th:text="${buyer.email}">john.doe@example.com</p>
+                        <span class="profile-badge pulse" th:text="${buyer.buyerType}">SMALL_BUYER</span>
+                    </div>
+                </div>
+
+                <ul class="profile-nav">
+                    <li><a href="/profile" class="active"><i class="fas fa-user"></i> Profile Information</a></li>
+                    <li><a href="/orders/history"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
+                    <li><a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Account Settings</a></li>
+                </ul>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content slide-in-right">
+                <div th:if="${param.success}" class="alert alert-success fade-in">
+                    <i class="fas fa-check-circle"></i> Profile updated successfully!
+                </div>
+
+                <h2 class="section-title">
+                    <span class="title-icon"><i class="fas fa-user-circle"></i></span>
+                    Profile Information
+                </h2>
+
+                <!-- View Mode -->
+                <div th:if="${!editMode}">
+
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-signature"></i> First Name</div>
+                            <div class="detail-value" th:text="${buyer.firstName}">John</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-signature"></i> Last Name</div>
+                            <div class="detail-value" th:text="${buyer.lastName}">Doe</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-envelope"></i> Email</div>
+                            <div class="detail-value" th:text="${buyer.email}">john.doe@example.com</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-phone"></i> Phone</div>
+                            <div class="detail-value" th:text="${buyer.phone}">+1234567890</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label"><i class="fas fa-tag"></i> Account Type</div>
+                            <div class="detail-value" th:text="${buyer.buyerType}">SMALL_BUYER</div>
+                        </div>
+                    </div>
+
+                    <a th:href="@{/profile/edit}" class="edit-profile-btn btn-hover">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                </div>
+
+            
+               <!-- Edit Mode Form -->
+<div th:if="${editMode}">
+    <form th:action="@{/profile/update}" method="post" th:object="${buyerDto}" class="edit-profile-form">
+
+        <div th:if="${#fields.hasErrors('*')}" class="alert alert-error fade-in">
+            <i class="fas fa-exclamation-circle"></i> Please correct the errors in the form.
+        </div>
+
+        <div class="form-group">
+            <label for="firstName"><i class="fas fa-signature"></i> First Name</label>
+            <input type="text" id="firstName" th:field="*{firstName}" class="form-control" name="firstName">
+            <small class="text-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="lastName"><i class="fas fa-signature"></i> Last Name</label>
+            <input type="text" id="lastName" th:field="*{lastName}" class="form-control" name="lastName">
+            <small class="text-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" th:field="*{email}" class="form-control" readonly name="email">
+        </div>
+
+        <div class="form-group">
+            <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+            <input type="tel" id="phone" th:field="*{phone}" class="form-control" name="phone">
+            <small class="text-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="buyerType" class="form-label"><i class="fas fa-tag"></i> Buyer Type</label>
+            <select id="buyerType" class="form-control" th:field="*{buyerType}" name="buyerType" required>
+                <option value="" th:selected="*{buyerType == null}">Select your type</option>
+                <option value="BULK_BUYER" th:selected="*{buyerType == 'BULK_BUYER'}">Bulk Buyer</option>
+                <option value="SMALL_BUYER" th:selected="*{buyerType == 'SMALL_BUYER'}">Small Buyer</option>
+            </select>
+            <small class="text-error" th:if="${#fields.hasErrors('buyerType')}" th:errors="*{buyerType}"></small>
+        </div>
+
+        <div class="form-group full-width">
+            <label for="password"><i class="fas fa-lock"></i> New Password</label>
+            <input type="password" id="password" th:field="*{password}" class="form-control" name="password">
+            <small class="text-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+        </div>
+
+        <div class="form-group full-width">
+            <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" name="confirmPassword">
+            <small class="text-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-hover">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a th:href="@{/profile}" class="btn btn-secondary btn-hover">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu');
+            const navbarNav = document.querySelector('.navbar-nav');
+
+            mobileMenuButton.addEventListener('click', function() {
+                navbarNav.classList.toggle('active');
+                mobileMenuButton.classList.toggle('active');
+            });
+
+            // Add animation to profile badge on hover
+            const profileBadge = document.querySelector('.profile-badge');
+            if (profileBadge) {
+                profileBadge.addEventListener('mouseenter', function() {
+                    this.classList.add('bounce');
+                });
+
+                profileBadge.addEventListener('animationend', function() {
+                    this.classList.remove('bounce');
+                });
+            }
+
+            // Add smooth scroll to all links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

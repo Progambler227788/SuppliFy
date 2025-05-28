@@ -1,5 +1,6 @@
 package com.supplify.service.Implement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ import com.supplify.entity.Seller;
 import com.supplify.repository.BuyerRepository;
 import com.supplify.repository.RoleRepository;
 import com.supplify.services.BuyerService;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class BuyerServiceImpl implements BuyerService {
@@ -69,6 +72,22 @@ public class BuyerServiceImpl implements BuyerService {
     @Override
     public Buyer findBuyerByEmail(String email) {
         return buyerRepository.findByEmail(email);
+    }
+    @Override
+    public void updateBuyer(Buyer buyer, BuyerDto buyerDto) throws IOException {
+        // Update basic info
+        buyer.setFirstName(buyerDto.getFirstName());
+        buyer.setLastName(buyerDto.getLastName());
+        buyer.setPhone(buyerDto.getPhone());
+        buyer.setEmail(buyerDto.getEmail());
+        buyer.setBuyerType(buyerDto.getBuyerType());
+
+        // Update password if provided
+        if (StringUtils.hasText(buyerDto.getPassword())) {
+            buyer.setPassword(passwordEncoder.encode(buyerDto.getPassword()));
+        }
+
+        buyerRepository.save(buyer);
     }
 
     @Override

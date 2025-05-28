@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products - SuppliFy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/animations.css">
+  <link rel="stylesheet" href="/static/css/products.css">
+  <link rel="stylesheet" href="/static/css/buyerdashboard.css">
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="#" class="navbar-brand">SuppliFy</a>
+    <div class="navbar-toggle" id="mobile-menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="/buyerdashboard" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="/products_for_buy" class="nav-link active"><i class="fas fa-box-open"></i> Products</a></li>
+      <li><a href="#" class="nav-link"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+      <li><a th:href="@{/profile}" class="nav-link"><i class="fas fa-user"></i> Profile</a></li>
+      <li><a th:href="@{/logout}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="products-section slide-in-bottom">
+    <h2 class="section-title">
+      <span class="title-icon"><i class="fas fa-boxes"></i></span>
+      Available Products
+    </h2>
+
+    <!-- Search Form -->
+    <form th:action="@{/products_for_buy/search}" method="get" class="search-form fade-in">
+      <input type="text" name="keyword" th:value="${keyword}" placeholder="Search products..." class="search-input">
+      <button type="submit" class="search-btn btn-hover">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </form>
+
+    <!-- Filter Options -->
+    <div class="filter-options fade-in">
+      <div class="filter-group">
+        <label for="category"><i class="fas fa-tags"></i> Category:</label>
+        <select id="category" class="filter-select">
+          <option value="all">All Categories</option>
+          <option th:each="category : ${categories}"
+                  th:value="${category.id}"
+                  th:text="${category.name}">
+            Category
+          </option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="sort"><i class="fas fa-sort"></i> Sort By:</label>
+        <select id="sort" class="filter-select">
+          <option value="popular">Most Popular</option>
+          <option value="newest">Newest</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+        </select>
+      </div>
+      <button class="btn btn-secondary btn-hover" id="apply-filters">
+        <i class="fas fa-filter"></i> Apply Filters
+      </button>
+    </div>
+
+    <div class="products-grid">
+      <div th:each="product : ${products}" class="product-item fade-in" th:id="${product.id}">
+        <div class="product-image-container">
+          <img th:src="${product.imageUrls[0]}" alt="Product Image" class="product-image">
+          <div class="discount-badge pulse" th:if="${product.discountPercentage > 0}">
+            -<span th:text="${product.discountPercentage}">0</span>%
+          </div>
+        </div>
+        <div class="product-details">
+          <h3 class="product-name" th:text="${product.name}">Product Name</h3>
+          <p class="product-description" th:text="${product.description}">Product Description</p>
+          <div class="product-pricing">
+            <span class="original-price" th:if="${product.discountPercentage > 0}" th:text="'$' + ${product.price}">$0.00</span>
+            <span class="discounted-price" th:text="'$' + ${product.discountedPrice}">$0.00</span>
+          </div>
+          <div class="product-stock">
+            <i class="fas fa-cubes"></i> <span th:text="${product.quantity} + ' left in stock'">0 left in stock</span>
+          </div>
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-buy btn-hover" th:onclick="|window.location.href='/checkout/${product.id}';|">
+            <i class="fas fa-shopping-cart"></i> Buy Now
+          </button>
+          <button class="btn btn-cart btn-hover" th:onclick="'addToCart(\'' + ${product.id} + '\')'">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="btn btn-message btn-hover"
+                  th:onclick="'window.location.href=\'/messages/open/' + ${product.id} + '\';'">
+            <i class="fas fa-envelope"></i> Message
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination fade-in" th:if="${totalPages > 1}">
+      <a th:if="${currentPage > 1}" th:href="@{'/products_for_buy?page=' + ${currentPage - 1}}">
+        <i class="fas fa-chevron-left"></i> Previous
+      </a>
+      <span th:each="page : ${#numbers.sequence(1, totalPages)}">
+                <a th:if="${page == currentPage}" class="active" th:text="${page}">1</a>
+                <a th:unless="${page == currentPage}" th:href="@{'/products_for_buy?page=' + ${page}}" th:text="${page}">1</a>
+            </span>
+      <a th:if="${currentPage < totalPages}" th:href="@{'/products_for_buy?page=' + ${currentPage + 1}}">
+        Next <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/script.js"></script>
+<script src="/static/js/products.js"></script>
+</body>
+</html>

@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,6 +30,8 @@ import com.supplify.services.BuyerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class BuyerController {
@@ -51,8 +54,152 @@ public class BuyerController {
 	    model.addAttribute("buyerDto", new BuyerDto()); // Change to buyerDto
 	    return "buyer"; // Ensure this returns the correct Thymeleaf template
 	}
-	
-	
+
+	@GetMapping("/profile")
+	public String viewProfile(
+			@AuthenticationPrincipal UserDetails userDetails,
+			Model model) {
+
+		String email = userDetails.getUsername();
+		Buyer buyer = buyerService.findBuyerByEmail(email);
+
+		model.addAttribute("buyer", buyer);
+		model.addAttribute("editMode", false);
+
+		return "profile";
+	}
+
+	@GetMapping("/profile/edit")
+	public String editProfile(
+			@AuthenticationPrincipal UserDetails userDetails,
+			Model model) {
+
+		String email = userDetails.getUsername();
+		Buyer buyer = buyerService.findBuyerByEmail(email);
+
+		// Convert Buyer to BuyerDto for editing
+		BuyerDto buyerDto = new BuyerDto();
+		buyerDto.setFirstName(buyer.getFirstName());
+		buyerDto.setLastName(buyer.getLastName());
+		buyerDto.setEmail(buyer.getEmail());
+		buyerDto.setPhone(buyer.getPhone());
+		buyerDto.setBuyerType(buyer.getBuyerType());
+
+		model.addAttribute("buyer", buyer);
+		model.addAttribute("buyerDto", buyerDto);
+		model.addAttribute("editMode", true);
+
+		return "profile";
+	}
+
+	@PostMapping("/profile/update")
+	public String updateProfile(
+			@Valid @ModelAttribute("buyerDto") BuyerDto buyerDto,
+			BindingResult result,
+			@AuthenticationPrincipal UserDetails userDetails,
+			Model model,
+			RedirectAttributes redirectAttributes) throws IOException {
+
+		logger.debug("Entering updateProfile method");
+		logger.debug("BuyerDto received: " + buyerDto.toString());
+
+		String email = userDetails.getUsername();
+		logger.debug("Authenticated user email: " + email);
+
+		Buyer buyer = buyerService.findBuyerByEmail(email);
+		logger.debug("Found buyer from DB: " + (buyer != null ? buyer.toString() : "null"));
+
+
+		if (buyerDto.getPassword() == null) {
+			buyerDto.setPassword(buyer.getPassword()); // Preserve existing password if not provided
+			buyerDto.setConfirmPassword(buyer.getPassword()); // Ensure confirm password matches
+		}
+
+		if (result.hasErrors()) {
+			logger.debug("Validation errors found:");
+			result.getAllErrors().forEach(error -> logger.debug(error.toString()));
+
+			model.addAttribute("buyer", buyer);
+			model.addAttribute("editMode", true);
+			return "profile";
+		}
+
+		try {
+			logger.debug("Attempting to update buyer...");
+			logger.debug("Current buyer data before update: " + buyer.toString());
+			logger.debug("New buyer data from DTO: " + buyerDto.toString());
+
+			buyerService.updateBuyer(buyer, buyerDto);
+
+			logger.debug("Update successful, redirecting...");
+			redirectAttributes.addAttribute("success", true);
+		} catch (IOException e) {
+			logger.error("Error updating profile", e);
+			redirectAttributes.addFlashAttribute("error", "Error updating profile. Please try again.");
+		} catch (Exception e) {
+			logger.error("Unexpected error during profile update", e);
+			redirectAttributes.addFlashAttribute("error", "Unexpected error occurred. Please try again.");
+		}
+
+		return "redirect:/profile";
+	}
+
+
+	@GetMapping("/products_for_buy")
+	public String showProducts(
+			@AuthenticationPrincipal UserDetails userDetails,
+			Model model) {
+
+		if (userDetails == null) {
+			throw new IllegalStateException("UserDetails is null. Ensure the user is logged in.");
+		}
+
+		// Fetch buyer details based on the logged-in user's email
+		String email = userDetails.getUsername();
+		Buyer buyer = buyerService.findBuyerByEmail(email);
+
+		if (buyer == null) {
+			throw new IllegalStateException("Buyer not found for email: " + email);
+		}
+
+		String buyerType = buyer.getBuyerType().name(); // Assuming buyerType is an Enum
+
+		List<Product> allProducts = productServiceImpl.getAllProducts();
+
+		List<Product> filteredProducts;
+
+		if (allProducts != null) {
+			// Filter products based on buyer type
+			if ("BULK_BUYER".equalsIgnoreCase(buyerType)) {
+				filteredProducts = allProducts.stream()
+						.filter(product -> product.getQuantity() >= 200)
+						.toList();
+			} else { // SMALL_BUYER
+				filteredProducts = allProducts.stream()
+						.filter(product -> product.getQuantity() < 200)
+						.toList();
+			}
+
+			// Debugging output
+			System.out.println("Buyer Type: " + buyerType);
+			for (Product product : filteredProducts) {
+				System.out.println("Filtered Product: " + product.getName());
+				System.out.println("Quantity: " + product.getQuantity());
+			}
+		} else {
+			System.out.println("Product list is null!");
+			filteredProducts = List.of(); // Empty list if null
+		}
+
+		model.addAttribute("products", filteredProducts);
+		model.addAttribute("buyerType", buyerType);
+		return "products_for_buy";
+	}
+
+
+
+
+
 	@GetMapping("/buyerdashboard")
 	public String showBuyerDashboard(
 	        @AuthenticationPrincipal UserDetails userDetails,
