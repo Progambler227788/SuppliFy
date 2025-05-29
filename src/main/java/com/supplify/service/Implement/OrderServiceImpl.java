@@ -4,6 +4,7 @@ import com.supplify.dto.OrderDto;
 import com.supplify.entity.Buyer;
 import com.supplify.entity.Order;
 import com.supplify.entity.Product;
+import com.supplify.entity.Seller;
 import com.supplify.repository.OrderRepository;
 import com.supplify.repository.ProductRepository;
 import com.supplify.services.OrderService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -64,4 +66,29 @@ public class OrderServiceImpl implements OrderService {
         }
         return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
+
+
+    @Override
+    public List<Order> getOrdersBySellers(Seller seller, String status) {
+        if (status == null || status.isEmpty()) {
+            return orderRepository.findByProductSellerOrderByOrderDateDesc(seller);
+        }
+        return orderRepository.findByProductSellerAndStatusOrderByOrderDateDesc(seller, status);
+    }
+
+    @Override
+    public Order getOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+        order.setStatus(status);
+        orderRepository.save(order);
+    }
+
 }

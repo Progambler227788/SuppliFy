@@ -1,5 +1,7 @@
 package com.supplify.controller;
 
+import com.supplify.entity.Order;
+import com.supplify.services.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -32,8 +34,12 @@ public class SellerController {
 	@Autowired
 	private final SellerService sellerService;
 
-	public SellerController(SellerService userService) {
+	@Autowired
+	private final OrderService orderService;
+
+	public SellerController(SellerService userService, OrderService orderService) {
 		this.sellerService = userService;
+		this.orderService = orderService;
 	}
 
 	
@@ -224,6 +230,27 @@ public class SellerController {
 	  public void logout(HttpServletRequest
 	  request) { HttpSession session = request.getSession(false); if (session !=
 	  null) { session.invalidate();  }}
+
+
+	// orders for sellers
+
+
+	@GetMapping("/sellers_orders")
+	public String viewOrders(@RequestParam(value = "status", required = false) String status,
+							 Principal principal, Model model) {
+		Seller seller = sellerService.findSellerByEmail(principal.getName());
+		List<Order> orders = orderService.getOrdersBySellers(seller, status);
+		model.addAttribute("orders", orders);
+		model.addAttribute("status", status);
+		return "sellers_orders";
+	}
+
+	@PostMapping("/seller/order/update")
+	public String updateOrderStatus(@RequestParam("orderId") Long orderId,
+									@RequestParam("status") String status) {
+		orderService.updateOrderStatus(orderId, status);
+		return "redirect:/sellers_orders";
+	}
 	 
 }
 

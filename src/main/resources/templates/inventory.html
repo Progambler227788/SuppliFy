@@ -4,18 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Management</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --background-color: #f4f6f9;
-            --text-color: #2c3e50;
+            --primary-color: #4361ee;
+            --primary-light: #3a86ff;
+            --secondary-color: #4cc9f0;
+            --accent-color: #f72585;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+            --text-dark: #1e293b;
+            --text-medium: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
             --white: #ffffff;
-            --border-radius: 12px;
-            --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --table-header-bg: #2980b9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --rounded-sm: 0.25rem;
+            --rounded: 0.5rem;
+            --rounded-lg: 0.75rem;
+            --rounded-xl: 1rem;
         }
 
         * {
@@ -26,26 +38,26 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--text-color);
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+            color: var(--text-dark);
+            line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Navbar */
- .navbar {
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--white);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px 5%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
+            animation: slideInDown 0.5s ease-out forwards;
         }
 
         .navbar-brand {
@@ -55,216 +67,423 @@
             text-decoration: none;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            color: var(--primary-light);
+            transform: translateY(-2px);
         }
 
         .navbar-brand i {
-            margin-right: 10px;
+            font-size: 1.25rem;
         }
 
         .navbar-actions {
             display: flex;
-            gap: 10px;
+            gap: 1rem;
         }
-.navbar-actions a {
-    text-decoration: none;
-}
-.shop-welcome-title {
-        text-align: center;
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        font-weight: 600;
-        text-transform: capitalize;
-        padding: 10px;
-        border-radius: 8px;
-    }
-.btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-decoration: none; /* Ensure no underline for buttons */
-}
 
-.btn-primary {
-    background-color: var(--primary-color);
-    color: var(--white);
-}
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--rounded);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
 
-.btn-primary:hover {
-    background-color: #2980b9;
-}
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: var(--white);
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
         }
 
-        .btn-secondary:hover {
-            background-color: #27ae60;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
         }
 
-        .btn-danger {
-            background-color: #e74c3c;
-            color: var(--white);
-        }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
+        /* Shop Welcome Title */
+        .shop-welcome-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin: 6rem 0 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            animation: fadeIn 0.6s ease-in forwards;
         }
 
         /* Inventory Container */
         .inventory-container {
-            max-width: 1200px;
-            margin: 80px auto 20px;
-            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+            padding: 2rem;
             background: var(--white);
-            border-radius: var(--border-radius);
+            border-radius: var(--rounded-xl);
             box-shadow: var(--shadow);
+            animation: slideInUp 0.6s ease-out forwards;
         }
 
+        /* Inventory Header */
         .inventory-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .inventory-header input {
-            flex-grow: 1;
-            max-width: 300px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--rounded);
             font-size: 1rem;
             transition: all 0.3s ease;
+            background-color: var(--bg-light);
         }
 
         .inventory-header input:focus {
-            border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
         }
 
-        /* Table */
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Table Styles */
         .inventory-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--rounded-lg);
+            overflow: hidden;
         }
 
         .inventory-table th,
         .inventory-table td {
-            padding: 15px;
+            padding: 1.25rem;
             text-align: left;
-            border: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .inventory-table th {
-            background-color: var(--table-header-bg);
+            background-color: var(--primary-color);
             color: var(--white);
+            font-weight: 600;
             text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
 
-        .inventory-table td {
-            background-color: var(--background-color);
+        .inventory-table tr:nth-child(even) td {
+            background-color: var(--bg-light);
         }
 
         .inventory-table tr:hover td {
-            background-color: #ecf0f1;
+            background-color: rgba(67, 97, 238, 0.05);
         }
 
         /* Product Image */
         .product-image {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            border-radius: var(--rounded-sm);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+
+        .product-image:hover {
+            transform: scale(1.1);
+        }
+
+        /* Status Badges */
+        .status-in-stock {
+            color: var(--success-color);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-out-of-stock {
+            color: var(--error-color);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: #3aa8d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 201, 240, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--accent-color);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #e11d8d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(247, 37, 133, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
-            .inventory-header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .inventory-header input {
-                max-width: 100%;
-            }
-
-            .btn {
-                font-size: 0.8rem;
+        @media (max-width: 1024px) {
+            .inventory-container {
+                padding: 1.5rem;
             }
 
             .inventory-table th,
             .inventory-table td {
-                padding: 10px;
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+
+            .navbar-actions {
+                width: 100%;
+                margin-top: 1rem;
+                justify-content: flex-end;
+            }
+
+            .shop-welcome-title {
+                margin-top: 8rem;
+                font-size: 1.75rem;
+            }
+
+            .inventory-header {
+                flex-direction: column;
+            }
+
+            .inventory-header input {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .inventory-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .shop-welcome-title {
+                font-size: 1.5rem;
+                margin-top: 9rem;
+            }
+
+            .inventory-container {
+                padding: 1rem;
+            }
+
+            .inventory-table th,
+            .inventory-table td {
+                padding: 0.75rem;
             }
         }
     </style>
 </head>
 <body>
-    <header class="navbar">
-        <a class="navbar-brand" th:href="@{/login}">
-            <i class="fas fa-shopping-cart"></i> SuppliFy
+<!-- Navbar -->
+<header class="navbar">
+    <a class="navbar-brand" th:href="@{/sellerdashboard}">
+        <i class="fas fa-store"></i> SuppliFy
+    </a>
+    <div class="navbar-actions">
+        <a href="/inventory/add" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Product
         </a>
-        <div class="navbar-actions">
-            <a href="/inventory/add" class="btn btn-primary">+ Add Product</a>
-            <a href="/sellerdashboard" class="btn btn-primary">Dash</a>
-            <a href="/logout" class="btn btn-primary">Logout</a>
-        </div>
-    </header>
-<br>
-<br>
-<br>
-<br>
-      <h2 class="shop-welcome-title">
-Welcome on <span th:text="${seller.shopname}"></span> Shop</h2>
-    <div class="inventory-container">
-        <form method="get" action="/inventory" class="inventory-header">
-            <input type="text" name="keyword" placeholder="Search products..." th:value="${keyword}" />
-            <div class="header-actions">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </div>
-        </form>
-
-        <table class="inventory-table">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Product Name</th>
-                    <th>Price</th>
-                    <th>Discounted Price</th>
-                    <th>Quantity</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="product : ${products}">
-                    <td>
-                        <div th:each="url : ${product.imageUrls}">
-                            <img th:src="${url}" alt="Product Image" class="product-image" />
-                        </div>
-                    </td>
-                    <td th:text="${product.name}"></td>
-                    <td th:text="${product.price}"></td>
-                    <td th:text="${product.discountedPrice}"></td>
-                    <td th:text="${product.quantity}"></td>
-                    <td th:text="${product.category}"></td>
-                    <td th:text="${product.quantity > 0 ? 'In Stock' : 'Out of Stock'}"></td>
-                    <td>
-                        <a th:href="@{/inventory/edit/{id}(id=${product.id})}" class="btn btn-secondary">Edit</a>
-                        <a th:href="@{/inventory/delete/{id}(id=${product.id})}" class="btn btn-danger">Delete</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <a href="/sellerdashboard" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="/logout" class="btn btn-primary">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
     </div>
+</header>
+
+<!-- Shop Welcome Title -->
+<h2 class="shop-welcome-title">
+    Welcome to <span th:text="${seller.shopname}"></span>
+</h2>
+
+<!-- Inventory Container -->
+<div class="inventory-container">
+    <form method="get" action="/inventory" class="inventory-header">
+        <input type="text" name="keyword" placeholder="Search products..." th:value="${keyword}" />
+        <div class="header-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </form>
+
+    <table class="inventory-table">
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Discounted Price</th>
+            <th>Quantity</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}">
+            <td>
+                <div th:each="url : ${product.imageUrls}">
+                    <img th:src="${url}" alt="Product Image" class="product-image" />
+                </div>
+            </td>
+            <td th:text="${product.name}"></td>
+            <td th:text="${'$' + product.price}"></td>
+            <td th:text="${'$' + product.discountedPrice}"></td>
+            <td th:text="${product.quantity}"></td>
+            <td th:text="${product.category}"></td>
+            <td>
+                        <span th:class="${product.quantity > 0} ? 'status-in-stock' : 'status-out-of-stock'">
+                            <i th:class="${product.quantity > 0} ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                            <span th:text="${product.quantity > 0} ? 'In Stock' : 'Out of Stock'"></span>
+                        </span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <a th:href="@{/inventory/edit/{id}(id=${product.id})}" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a th:href="@{/inventory/delete/{id}(id=${product.id})}" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Simple animation trigger for elements when they come into view
+    document.addEventListener('DOMContentLoaded', function() {
+        const animateOnScroll = function() {
+            const elements = document.querySelectorAll('.inventory-table tr');
+
+            elements.forEach((element, index) => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+
+                if (elementPosition < windowHeight - 100) {
+                    setTimeout(() => {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        };
+
+        // Set initial state for animation
+        const rows = document.querySelectorAll('.inventory-table tr');
+        rows.forEach(row => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(20px)';
+            row.style.transition = 'all 0.4s ease-out';
+        });
+
+        // Run once on load
+        animateOnScroll();
+
+        // Run on scroll
+        window.addEventListener('scroll', animateOnScroll);
+    });
+</script>
 </body>
 </html>

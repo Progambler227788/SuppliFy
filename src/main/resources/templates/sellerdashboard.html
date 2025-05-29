@@ -9,14 +9,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --background-color: #f4f6f9;
-            --text-color: #2c3e50;
+            --primary-color: #4361ee;
+            --primary-light: #3a86ff;
+            --secondary-color: #4cc9f0;
+            --accent-color: #f72585;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+            --text-dark: #1e293b;
+            --text-medium: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
             --white: #ffffff;
-            --border-radius: 12px;
-            --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            --table-header-bg: #2980b9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --rounded-sm: 0.25rem;
+            --rounded: 0.5rem;
+            --rounded-lg: 0.75rem;
+            --rounded-xl: 1rem;
         }
 
         * {
@@ -27,26 +39,30 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--text-color);
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+            color: var(--text-dark);
+            line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Navbar */
+        /* Navbar Styles */
         .navbar {
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--white);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px 5%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
         }
 
         .navbar-brand {
@@ -56,102 +72,235 @@
             text-decoration: none;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
         }
 
-        .navbar-brand i {
-            margin-right: 10px;
+        .navbar-brand::before {
+            content: "";
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: var(--primary-color);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z' /%3E%3C/svg%3E");
+            mask-repeat: no-repeat;
+            mask-position: center;
         }
 
-        .navbar-nav, .navbar-nav-right {
+        .navbar-nav {
             display: flex;
-            gap: 15px;
+            list-style: none;
+            gap: 1.5rem;
         }
 
         .nav-link {
-            font-size: 1rem;
-            color: var(--text-color);
+            color: var(--text-medium);
             text-decoration: none;
-            transition: color 0.3s ease;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--rounded-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
         }
 
         .nav-link:hover {
             color: var(--primary-color);
         }
 
+        .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .nav-link.active::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .navbar-toggle {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+        }
+
+        .navbar-toggle .bar {
+            height: 2px;
+            width: 100%;
+            background-color: var(--text-dark);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
         /* Main Content */
         .main-content {
-            margin: 100px auto 20px;
-            padding: 20px;
-            max-width: 1200px;
-            text-align: center;
-        }
-
-        .welcome-section h1 {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .welcome-section p {
-            font-size: 1.2rem;
-            color: var(--text-color);
-            margin-bottom: 30px;
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         /* Dashboard Sections */
         .dashboard-sections {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .card {
             background-color: var(--white);
-            padding: 20px;
-            border-radius: var(--border-radius);
+            border-radius: var(--rounded-xl);
             box-shadow: var(--shadow);
-            text-align: left;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            border-top: 4px solid var(--primary-color);
+            animation: fadeIn 0.6s ease-in forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
         }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: var(--primary-color);
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
         }
 
         .card-text {
-            font-size: 1rem;
-            color: var(--text-color);
-            margin-bottom: 20px;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.7;
         }
 
         .btn {
-            padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: var(--white);
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--rounded);
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
             text-decoration: none;
-            transition: background-color 0.3s ease;
         }
 
-        .btn:hover {
-            background-color: #2980b9;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: var(--white);
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
         }
 
         /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-sections {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
-            .navbar-nav, .navbar-nav-right {
+            .navbar-container {
                 flex-direction: column;
-                gap: 10px;
+                align-items: flex-start;
             }
 
-            .dashboard-sections {
-                grid-template-columns: 1fr;
+            .navbar-nav {
+                flex-direction: column;
+                width: 100%;
+                display: none;
+                margin-top: 1rem;
+                gap: 0.5rem;
+            }
+
+            .navbar-nav.active {
+                display: flex;
+                animation: slideInDown 0.4s ease-out forwards;
+            }
+
+            .nav-link {
+                padding: 0.75rem 1rem;
+                width: 100%;
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+
+            .navbar-toggle {
+                display: flex;
+                position: absolute;
+                right: 2rem;
+                top: 1.5rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
     </style>
@@ -159,19 +308,23 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <a class="navbar-brand" th:href="@{/sellerdashboard}">SuppliFy</a>
-        <ul class="navbar-nav">
-            <li><a class="nav-link" th:href="@{/dashboard}" style="padding-right: 20px;">Home</a></li>
-            <li><a class="nav-link" th:href="@{/seller/products}" style="padding-right: 20px;">My Products</a></li>
-            <li><a class="nav-link" th:href="@{/seller/orders}" style="padding-right: 20px;">Orders</a></li>
-            <li><a class="nav-link" th:href="@{/seller/settings}">Settings</a></li>
-        </ul>
-        <ul class="navbar-nav-right">
-            <li><a class="nav-link" th:href="@{/messages}" style="padding-right: 20px;">Messages</a></li>
-            <li><a class="nav-link" th:href="@{/logout}">Logout</a></li>
-        </ul>
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">SuppliFy</a>
+            <div class="navbar-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="navbar-nav">
+                <li><a href="/sellerdashboard" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a th:href="@{/inventory}" class="nav-link"><i class="fas fa-box-open"></i> Products</a></li>
+                <li><a th:href="@{/sellers_orders}" class="nav-link"><i class="fas fa-box-open"></i> Orders</a></li>
+                <li><a th:href="@{/messages}"  class="nav-link"><i class="fas fa-shopping-cart"></i> Messages</a></li>
+                <li><a th:href="@{/seller_profile}" class="nav-link"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a th:href="@{/logout}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
     </nav>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="welcome-section">
@@ -191,7 +344,7 @@
             <div class="card">
                 <h5 class="card-title">Orders</h5>
                 <p class="card-text">Track and manage customer orders.</p>
-                <a th:href="@{/seller/orders}" class="btn">View Orders</a>
+                <a th:href="@{/sellers_orders}" class="btn">View Orders</a>
             </div>
 
             <!-- Settings Section -->

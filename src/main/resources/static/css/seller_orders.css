@@ -1,0 +1,232 @@
+/* Orders Page Specific Styles */
+    .orders-container {
+        animation: fadeIn 0.6s ease-in forwards;
+    }
+
+    .orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .orders-header h2 {
+        font-size: 1.75rem;
+        color: var(--primary-color);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .orders-header h2::before {
+        content: "";
+        display: inline-block;
+        width: 1.75rem;
+        height: 1.75rem;
+        background-color: var(--primary-color);
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z' clip-rule='evenodd' /%3E%3Cpath fill-rule='evenodd' d='M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z' clip-rule='evenodd' /%3E%3C/svg%3E");
+        mask-repeat: no-repeat;
+        mask-position: center;
+    }
+
+    .filter-form {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-form label {
+        font-weight: 500;
+        color: var(--text-medium);
+    }
+
+    .filter-form select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--rounded);
+        background-color: var(--white);
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .filter-form select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .filter-form button {
+        padding: 0.5rem 1.25rem;
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        border-radius: var(--rounded);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-form button:hover {
+        background-color: var(--primary-light);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        box-shadow: var(--shadow-sm);
+        border-radius: var(--rounded-lg);
+        overflow: hidden;
+        animation: slideInUp 0.5s ease-out forwards;
+    }
+
+    th, td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+        background-color: var(--primary-color);
+        color: var(--white);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--bg-light);
+    }
+
+    tr:hover {
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .status-pending {
+        color: #f59e0b;
+        font-weight: 500;
+    }
+
+    .status-shipped {
+        color: #3b82f6;
+        font-weight: 500;
+    }
+
+    .status-delivered {
+        color: #10b981;
+        font-weight: 500;
+    }
+
+    .status-form {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-form select {
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--rounded-sm);
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .status-form select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .status-form button {
+        padding: 0.5rem 1rem;
+        background-color: var(--accent-color);
+        color: var(--white);
+        border: none;
+        border-radius: var(--rounded);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .status-form button:hover {
+        background-color: #e11d8d;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-muted);
+        animation: fadeIn 0.6s ease-in forwards;
+    }
+
+    .empty-orders i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--border-color);
+    }
+
+    .empty-orders p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-orders .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Responsive Table */
+    @media (max-width: 768px) {
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 0.75rem;
+        }
+
+        .status-form {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    /* Animation for status changes */
+    @keyframes statusChange {
+        0% {
+            background-color: transparent;
+        }
+        50% {
+            background-color: rgba(76, 201, 240, 0.2);
+        }
+        100% {
+            background-color: transparent;
+        }
+    }
+
+    .status-updated {
+        animation: statusChange 1.5s ease;
+    }
+
+    /* Slide in up animation */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }

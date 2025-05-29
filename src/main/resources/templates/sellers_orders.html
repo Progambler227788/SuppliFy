@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Orders</title>
+
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/animations.css">
+  <link rel="stylesheet" href="/static/css/orderHistory.css">
+  <link rel="stylesheet" href="/static/css/seller_orders.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<div class="main-content">
+  <div class="orders-container">
+    <div class="orders-header">
+      <h2>Your Orders</h2>
+
+      <form method="get" action="/sellers_orders" class="filter-form">
+        <label>Filter by Status:</label>
+        <select name="status">
+          <option value="" th:selected="${status == null or status == ''}">All</option>
+          <option value="PENDING" th:selected="${status == 'PENDING'}">Pending</option>
+          <option value="PROCESSING" th:selected="${status == 'PROCESSING'}">Processing</option>
+          <option value="SHIPPED" th:selected="${status == 'SHIPPED'}">Shipped</option>
+          <option value="DELIVERED" th:selected="${status == 'DELIVERED'}">Delivered</option>
+          <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">Cancelled</option>
+        </select>
+        <button type="submit">Filter</button>
+      </form>
+    </div>
+
+    <table>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+
+      <tr th:each="order : ${orders}" th:classappend="${order.status} ? 'status-updated' : ''">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.product.name}"></td>
+        <td th:text="${order.quantity}"></td>
+        <td>
+      <span th:classappend="|
+        ${order.status} == 'PENDING' ? 'status-pending' :
+        ${order.status} == 'PROCESSING' ? 'status-processing' :
+        ${order.status} == 'SHIPPED' ? 'status-shipped' :
+        ${order.status} == 'DELIVERED' ? 'status-delivered' :
+        ${order.status} == 'CANCELLED' ? 'status-cancelled' :
+        ''
+      |"
+            th:text="${order.status}"></span>
+        </td>
+        <td>
+          <form method="post" action="/seller/order/update" class="status-form">
+            <input type="hidden" name="orderId" th:value="${order.id}" />
+            <select name="status">
+              <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
+              <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
+              <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
+              <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Delivered</option>
+              <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Cancelled</option>
+            </select>
+            <button type="submit">Update</button>
+          </form>
+        </td>
+      </tr>
+
+      <tr th:unless="${orders} and ${not orders.empty}">
+        <td colspan="5" class="empty-orders">
+          <i class="fas fa-box-open"></i>
+          <p>No orders found</p>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+</div>
+</body>
+</html>
