@@ -4,53 +4,224 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pending Sellers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f5f5f5;
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #3a86ff;
+            --secondary-color: #4cc9f0;
+            --accent-color: #f72585;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+            --text-dark: #1e293b;
+            --text-medium: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --rounded-sm: 0.25rem;
+            --rounded: 0.5rem;
+            --rounded-lg: 0.75rem;
+            --rounded-xl: 1rem;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
         h2 {
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
             text-align: center;
         }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--rounded-lg);
             overflow: hidden;
+            animation: fadeIn 0.6s ease-in forwards;
         }
+
         th, td {
-            padding: 10px;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
         }
+
         th {
-            background: #007BFF;
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
-        .approve-btn {
-            background: green;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
+
+        tr:nth-child(even) {
+            background-color: var(--bg-light);
         }
-        .reject-btn {
-            background: red;
-            color: white;
-            padding: 5px 10px;
-            border: none;
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        /* Status Indicators */
+        .status-approved {
+            color: var(--success-color);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-pending {
+            color: var(--text-muted);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--rounded);
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .btn-approve {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-approve:hover {
+            background: #3cb371;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-reject {
+            background: var(--error-color);
+            color: var(--white);
+        }
+
+        .btn-reject:hover {
+            background: #e53935;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            body {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-
 <h2>Pending Sellers</h2>
 
 <table>
@@ -64,46 +235,119 @@
     </tr>
     </thead>
     <tbody id="pendingSellers">
-    <!-- Data will be inserted here -->
+    <tr class="loading">
+        <td colspan="5">
+            <div class="spinner"></div>
+            Loading sellers...
+        </td>
+    </tr>
     </tbody>
 </table>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        fetch("http://localhost:9098/admin/pending-sellers")
-            .then(response => response.json())
-            .then(sellers => {
-                console.log("Received sellers:", sellers); // Debugging
-                const tableBody = document.getElementById("pendingSellers");
+        const tableBody = document.getElementById("pendingSellers");
 
-                if (!tableBody) {
-                    console.error("Element with ID 'pendingSellers' not found.");
+        if (!tableBody) {
+            console.error("Element with ID 'pendingSellers' not found.");
+            return;
+        }
+
+        // Show loading state
+        tableBody.innerHTML = `
+            <tr class="loading">
+                <td colspan="5">
+                    <div class="spinner"></div>
+                    Loading sellers...
+                </td>
+            </tr>
+        `;
+
+        fetch("http://localhost:9098/admin/pending-sellers")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(sellers => {
+                console.log("Received sellers:", sellers);
+
+                if (sellers.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                <i class="fas fa-check-circle" style="font-size: 1.5rem; color: var(--success-color); margin-bottom: 0.5rem;"></i>
+                                <div>No pending sellers at the moment</div>
+                            </td>
+                        </tr>
+                    `;
                     return;
                 }
 
-                tableBody.innerHTML = ""; // Clear existing rows
+                tableBody.innerHTML = "";
 
                 sellers.forEach(seller => {
-                    const row = `<tr>
-                        <td>${seller.name}</td>
-                        <td>${seller.email}</td>
-                        <td>${seller.shopname}</td>
-                        <td>${seller.approved ? "Approved" : "Pending"}</td>
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${seller.name || 'N/A'}</td>
+                        <td>${seller.email || 'N/A'}</td>
+                        <td>${seller.shopname || 'N/A'}</td>
                         <td>
                             ${seller.approved ?
-                                `<span style="color: green;">Approved</span>` :
-                                `<button class="approve-btn" onclick="approveSeller('${seller.id}')">Approve</button>
-                                 <button class="reject-btn" onclick="rejectSeller('${seller.id}')">Reject</button>`
+                                `<span class="status-approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>` :
+                                `<span class="status-pending">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>`
                             }
                         </td>
-                    </tr>`;
-                    tableBody.innerHTML += row;
+                        <td>
+                            <div class="action-buttons">
+                                ${seller.approved ?
+                                    `<span class="status-approved">
+                                        <i class="fas fa-check-circle"></i> Approved
+                                    </span>` :
+                                    `<button class="btn btn-approve" onclick="approveSeller('${seller.id}')">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-reject" onclick="rejectSeller('${seller.id}')">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>`
+                                }
+                            </div>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
                 });
             })
-            .catch(error => console.error("Error loading sellers:", error));
+            .catch(error => {
+                console.error("Error loading sellers:", error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--error-color);">
+                            <i class="fas fa-exclamation-circle" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                            <div>Failed to load sellers. Please try again.</div>
+                            <button onclick="location.reload()" style="margin-top: 1rem;" class="btn" style="background: var(--primary-color); color: white;">
+                                <i class="fas fa-sync-alt"></i> Retry
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
     });
 
     function approveSeller(sellerId) {
+        if (!confirm("Are you sure you want to approve this seller?")) return;
+
+        const btn = event.target.closest('.btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Approving...`;
+        btn.disabled = true;
+
         fetch(`http://localhost:9098/admin/approve-seller/${sellerId}`, {
             method: "PUT",
             headers: {
@@ -112,16 +356,28 @@
         })
         .then(response => {
             if (response.ok) {
-                alert("Seller approved successfully!");
-                location.reload(); // Refresh list
+                showAlert("Seller approved successfully!", "success");
+                setTimeout(() => location.reload(), 1500);
             } else {
-                alert("Error approving seller.");
+                throw new Error("Approval failed");
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            console.error("Error:", error);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            showAlert("Error approving seller. Please try again.", "error");
+        });
     }
 
     function rejectSeller(sellerId) {
+        if (!confirm("Are you sure you want to reject this seller?")) return;
+
+        const btn = event.target.closest('.btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Rejecting...`;
+        btn.disabled = true;
+
         fetch(`http://localhost:9098/admin/reject-seller/${sellerId}`, {
             method: "DELETE",
             headers: {
@@ -130,15 +386,50 @@
         })
         .then(response => {
             if (response.ok) {
-                alert("Seller rejected successfully!");
-                location.reload(); // Refresh list
+                showAlert("Seller rejected successfully!", "success");
+                setTimeout(() => location.reload(), 1500);
             } else {
-                alert("Error rejecting seller.");
+                throw new Error("Rejection failed");
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            console.error("Error:", error);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            showAlert("Error rejecting seller. Please try again.", "error");
+        });
+    }
+
+    function showAlert(message, type) {
+        const alert = document.createElement("div");
+        alert.style.position = "fixed";
+        alert.style.top = "20px";
+        alert.style.right = "20px";
+        alert.style.padding = "1rem 1.5rem";
+        alert.style.borderRadius = "var(--rounded)";
+        alert.style.boxShadow = "var(--shadow-md)";
+        alert.style.color = "white";
+        alert.style.zIndex = "1000";
+        alert.style.display = "flex";
+        alert.style.alignItems = "center";
+        alert.style.gap = "0.75rem";
+        alert.style.animation = "fadeIn 0.3s ease-out";
+
+        if (type === "success") {
+            alert.style.backgroundColor = "var(--success-color)";
+            alert.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        } else {
+            alert.style.backgroundColor = "var(--error-color)";
+            alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        }
+
+        document.body.appendChild(alert);
+
+        setTimeout(() => {
+            alert.style.animation = "fadeOut 0.3s ease-out";
+            setTimeout(() => alert.remove(), 300);
+        }, 3000);
     }
 </script>
-
 </body>
 </html>

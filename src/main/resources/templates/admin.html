@@ -6,42 +6,217 @@
     <title>Admin - Sellers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #3a86ff;
+            --secondary-color: #4cc9f0;
+            --accent-color: #f72585;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+            --text-dark: #1e293b;
+            --text-medium: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --rounded-sm: 0.25rem;
+            --rounded: 0.5rem;
+            --rounded-lg: 0.75rem;
+            --rounded-xl: 1rem;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--rounded-lg);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-in forwards;
         }
+
         th, td {
-            border: 1px solid black;
-            padding: 8px;
+            padding: 1rem;
             text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
+
         th {
-            background-color: #f4f4f4;
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
-        .approve-button, .reject-button {
-            background-color: #4CAF50; /* Green */
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin-right: 5px; /* Space between buttons */
+
+        tr:nth-child(even) {
+            background-color: var(--bg-light);
         }
-        .approve-button:hover {
-            background-color: #45a049;
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
         }
-        .reject-button {
-            background-color: #f44336; /* Red */
-        }
-        .reject-button:hover {
-            background-color: #e53935;
-        }
+
+        /* Rejected Sellers Row */
         .rejected {
-            background-color: #ffcccc; /* Light red for rejected sellers */
+            background-color: rgba(248, 113, 113, 0.15);
+        }
+
+        .rejected:hover {
+            background-color: rgba(248, 113, 113, 0.25);
+        }
+
+        /* Button Styles */
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--rounded);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .approve-button {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .approve-button:hover {
+            background: #3cb371;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .reject-button {
+            background: var(--error-color);
+            color: var(--white);
+        }
+
+        .reject-button:hover {
+            background: #e53935;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Action Buttons Container */
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-buttons button {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .filter-buttons button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            body {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-buttons button {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .approve-button, .reject-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
         }
     </style>
 </head>
