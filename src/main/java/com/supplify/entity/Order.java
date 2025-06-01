@@ -39,6 +39,16 @@ public class Order {
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
+    @Column(name = "payment_intent_id")
+    private String paymentIntentId;
+
+    @ManyToOne
+    @JoinColumn(name = "rating", nullable = true)
+    private Rating rating;
+
+    @Column(name = "is_rated", columnDefinition = "boolean default false")
+    private boolean isRated = false;
+
     private String status; // e.g., PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
 
 

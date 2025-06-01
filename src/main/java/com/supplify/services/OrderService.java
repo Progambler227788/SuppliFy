@@ -19,4 +19,11 @@ public interface OrderService {
 
     public void updateOrderStatus(Long orderId, String status);
 
+
+    Order createPendingOrder(OrderDto orderDto, Buyer buyer);
+
+    void completeOrderAfterPayment(Long orderId, String paymentIntentId);
+
+    Order findByPaymentIntentId(String paymentIntentId);
+
 }

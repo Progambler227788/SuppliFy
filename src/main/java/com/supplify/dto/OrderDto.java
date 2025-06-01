@@ -15,4 +15,5 @@ public class OrderDto {
     private Long productId;
     private int quantity;
     private String shippingAddress; // Add this field
+    private String paymentIntentId;
 }

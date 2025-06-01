@@ -60,6 +60,73 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    @Transactional
+    public void completeOrderAfterPayment(Long orderId, String paymentIntentId) {
+
+        try {
+
+            logger.info("Order Service Implementation", "Inside the complete order");
+
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new RuntimeException("Order not found"));
+
+            // Verify payment intent matches
+            if (!paymentIntentId.equals(order.getPaymentIntentId())) {
+                throw new RuntimeException("Payment intent mismatch");
+            }
+
+            // Update order status
+            order.setStatus("PENDING");
+            orderRepository.save(order);
+
+            // Now deduct inventory
+            Product product = order.getProduct();
+            product.setQuantity(product.getQuantity() - order.getQuantity());
+            productRepository.save(product);
+
+        }
+
+        catch (Exception e) {
+            logger.error("Error processing order", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Order findByPaymentIntentId(String paymentIntentId) {
+        return orderRepository.findByPaymentIntentId(paymentIntentId)
+                .orElseThrow(() -> new RuntimeException("Order not found for payment intent"));
+    }
+
+    @Override
+    @Transactional
+    public Order createPendingOrder(OrderDto orderDto, Buyer buyer) {
+        try {
+            Product product = productRepository.findById(orderDto.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            // Calculate total amount but DON'T deduct inventory yet
+            BigDecimal totalAmount = calculateTotalAmount(product, orderDto.getQuantity());
+
+            Order order = new Order();
+            order.setBuyer(buyer);
+            order.setProduct(product);
+            order.setQuantity(orderDto.getQuantity());
+            order.setTotalAmount(totalAmount);
+            order.setOrderDate(LocalDateTime.now());
+            order.setStatus("PENDING_PAYMENT"); // Different status for pending payment
+            order.setShippingAddress(orderDto.getShippingAddress());
+            order.setPaymentIntentId(orderDto.getPaymentIntentId()); // Store payment intent ID
+
+            return orderRepository.save(order);
+        } catch (Exception e) {
+            logger.error("Error creating pending order", e);
+            throw e;
+        }
+    }
+
+
     private BigDecimal calculateTotalAmount(Product product, int quantity) {
         if (product.getDiscountedPrice() != null && product.getDiscountedPrice().compareTo(BigDecimal.ZERO) > 0) {
             return product.getDiscountedPrice().multiply(BigDecimal.valueOf(quantity));
@@ -71,10 +138,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getOrdersBySellers(Seller seller, String status) {
         if (status == null || status.isEmpty()) {
-            return orderRepository.findByProductSellerOrderByOrderDateDesc(seller);
+            List<Order> fetchedOrders = orderRepository.findByProductSellerOrderByOrderDateDesc(seller);
+            return fetchedOrders.stream()
+                    .filter(order -> !order.getStatus().equalsIgnoreCase("PENDING_PAYMENT"))
+                    .toList();
         }
+
         return orderRepository.findByProductSellerAndStatusOrderByOrderDateDesc(seller, status);
     }
+
 
     @Override
     public Order getOrderById(Long orderId) {

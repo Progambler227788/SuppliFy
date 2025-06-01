@@ -1,46 +1,116 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #3a86ff;
+            --secondary-color: #4cc9f0;
+            --accent-color: #f72585;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+            --warning-color: #f59e0b;
+            --text-dark: #1e293b;
+            --text-medium: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --rounded-sm: 0.25rem;
+            --rounded: 0.5rem;
+            --rounded-lg: 0.75rem;
+            --rounded-xl: 1rem;
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f6f9;
-            color: #212529;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.03), rgba(76, 201, 240, 0.03));
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bubbleIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .message-container {
             display: flex;
-            height: 100vh;
+            height: 90vh;
+            width: 90%;
             max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--rounded-xl);
             overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
         }
 
+        /* Contacts Section */
         .contacts-list {
             flex: 1;
-            background-color: #343a40;
-            color: #ffffff;
-            padding: 20px;
+            background: linear-gradient(135deg, #343a40, #2b2f33);
+            color: var(--white);
+            padding: 1.5rem;
             overflow-y: auto;
-            border-right: 1px solid #495057;
+            border-right: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
 
         .contacts-list h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
             font-weight: 600;
-            border-bottom: 2px solid #495057;
-            padding-bottom: 10px;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .contacts-list h3::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 3px;
         }
 
         .contacts-list ul {
@@ -50,193 +120,311 @@
         }
 
         .contact-item {
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
             cursor: pointer;
-            border-radius: 8px;
-            background-color: #495057;
-            transition: background-color 0.3s ease-in-out;
+            border-radius: var(--rounded);
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: fadeIn 0.5s ease-out;
+            animation-fill-mode: both;
+            animation-delay: calc(var(--contact-index) * 0.1s);
         }
 
         .contact-item:hover {
-            background-color: #6c757d;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .contact-item.active {
+            background-color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
         }
 
         .contact-item span {
-            font-size: 14px;
             display: block;
         }
 
+        .contact-item span:first-child {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-item span:last-child {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Chat Box Section */
         .chat-box {
             flex: 3;
             display: flex;
             flex-direction: column;
-            background-color: #f8f9fa;
-            padding: 30px;
-            border-left: 1px solid #e0e0e0;
+            background-color: var(--bg-light);
+            padding: 1.5rem;
         }
 
-        .chat-box h3 {
-            font-size: 26px;
+        .chat-header {
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chat-header h3 {
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 20px;
-            color: #343a40;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
+            color: var(--primary-color);
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: slideInFromLeft 0.5s ease-out;
         }
 
         .messages {
             flex: 1;
             overflow-y: auto;
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #ffffff;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--white);
+            border-radius: var(--rounded-lg);
+            box-shadow: var(--shadow-sm);
+            scroll-behavior: smooth;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
         }
 
         .message-sent, .message-received {
             display: flex;
-            margin-bottom: 12px;
-            align-items: flex-start;
-            flex-direction: column;
+            margin-bottom: 1rem;
+            animation: bubbleIn 0.3s ease-out forwards;
         }
 
         .message-sent {
-            align-items: flex-end;
+            justify-content: flex-end;
         }
 
         .message-received {
-            align-items: flex-start;
+            justify-content: flex-start;
         }
 
-        .message-sent p, .message-received p {
-            padding: 12px;
-            border-radius: 20px;
+        .message-sent .message-bubble,
+        .message-received .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--rounded-lg);
+            position: relative;
             word-wrap: break-word;
-            font-size: 14px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .message-sent p {
-            background-color: #007bff;
-            color: #ffffff;
+        .message-sent .message-bubble {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-bottom-right-radius: var(--rounded-sm);
         }
 
-        .message-received p {
-            background-color: #e9ecef;
-            color: #495057;
+        .message-received .message-bubble {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: var(--rounded-sm);
         }
 
         .timestamp {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-            align-self: flex-end; /* Align timestamp to the right */
-        }
-
-        /* Sent message timestamp */
-        .sent-timestamp {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-            text-align: right;
-            align-self: flex-end; /* Align to the right */
-        }
-
-        /* Received message timestamp */
-        .received-timestamp {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-            text-align: left;
-            align-self: flex-start; /* Align to the left */
-        }
-
-        .seen-status-container {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
             display: flex;
-            justify-content: flex-end;
             align-items: center;
-            margin-top: 5px;
-            width: 100%;
+        }
+
+        .message-sent .timestamp {
+            justify-content: flex-end;
+        }
+
+        .message-received .timestamp {
+            justify-content: flex-start;
         }
 
         .seen-status {
-            font-size: 12px;
-            color: #28a745;
-            margin-right: 5px;
-            font-weight: bold;
-        }
-
-        .seen-time {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .message-sent .message-content, .message-received .message-content {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            align-items: center;
+            margin-left: 0.5rem;
+            color: var(--success-color);
+            font-weight: 500;
         }
 
-        .message-sent .seen-status-container,
-        .message-received .seen-status-container {
-            margin-top: 2px;
+        .seen-status i {
+            margin-right: 0.25rem;
+            font-size: 0.8rem;
         }
 
-        .message-sent .sent-timestamp,
-        .message-received .sent-timestamp {
-            color: #999;
-            font-size: 12px;
-            margin-left: 0;
-            text-align: right;
+        .message-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
         }
 
         textarea {
             flex: 1;
             resize: none;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--rounded-lg);
+            font-size: 1rem;
             outline: none;
-            box-sizing: border-box;
-            min-height: 50px;
-            width: 100%;
+            transition: all 0.3s ease;
+            min-height: 60px;
+            max-height: 120px;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
         button {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0 1.5rem;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: var(--rounded-lg);
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease-in-out;
-        }
-
-        button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button:hover:not(:disabled) {
-            background-color: #0056b3;
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        button i {
+            margin-right: 0.5rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .typing-indicator.active {
+            opacity: 1;
+        }
+
+        .typing-dots {
+            display: flex;
+            padding: 0.5rem 1rem;
+            background-color: var(--white);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            display: inline-block;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .message-container {
+                flex-direction: column;
+                height: 95vh;
+                width: 95%;
+            }
+
+            .contacts-list {
+                flex: none;
+                height: 40vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .chat-box {
+                flex: 1;
+            }
+
+            .message-sent .message-bubble,
+            .message-received .message-bubble {
+                max-width: 85%;
+            }
+        }
+
+        /* Contact item animations */
+        .contact-item:nth-child(1) { --contact-index: 1; }
+        .contact-item:nth-child(2) { --contact-index: 2; }
+        .contact-item:nth-child(3) { --contact-index: 3; }
+        .contact-item:nth-child(4) { --contact-index: 4; }
+        .contact-item:nth-child(5) { --contact-index: 5; }
+        .contact-item:nth-child(n+6) { --contact-index: 6; }
     </style>
 </head>
 
 <body>
-
 <div class="message-container">
     <!-- Contacts Section -->
     <div class="contacts-list">
         <h3>Conversations</h3>
         <ul>
             <!-- Loop through contacts -->
-            <li th:each="user : ${contacts}" class="contact-item" th:data-id="${user.id}" th:id="${user.id}"
-                th:title="${user.name}" onclick="selectConversation(this)">
+            <li th:each="user, stat : ${contacts}" class="contact-item"
+                th:data-id="${user.id}" th:id="${user.id}"
+                th:title="${user.name}" onclick="selectConversation(this)"
+                th:classappend="${user.id == selectedContactId} ? 'active' : ''">
                 <span th:text="${user.name}"></span>
                 <span th:text="${user.role}"></span>
             </li>
@@ -245,27 +433,41 @@
 
     <!-- Chat Box Section -->
     <div class="chat-box">
-        <h3 id="activeContactName">Chat</h3>
+        <div class="chat-header">
+            <h3 id="activeContactName">Select a conversation</h3>
+        </div>
+
         <div class="messages" id="messageList">
             <div class="center-message" id="centerMessage">
-                Please select a contact to show its messages.
+                <i class="fas fa-comments" style="font-size: 3rem; color: var(--border-color); margin-bottom: 1rem;"></i>
+                <p>Select a contact to start chatting</p>
             </div>
         </div>
-        <form id="messageForm">
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <form id="messageForm" class="message-form">
             <input type="hidden" id="senderId" name="senderId" th:value="${currentUserId}">
             <input type="hidden" id="receiverId" name="receiverId" th:value="${selectedContactId}">
             <textarea id="messageContent" name="content" placeholder="Type your message..." required disabled></textarea>
-            <button type="submit" disabled>Send</button>
+            <button type="submit" disabled>
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
         </form>
     </div>
-
 </div>
 
 <script>
     window.addEventListener("DOMContentLoaded", () => {
         try {
-            const selectedContactId = '[[${SelectedContactId}]]';
-            const selectedContactName = '[[${SelectedContactName}]]';
+            const selectedContactId = '[[${selectedContactId}]]';
+            const selectedContactName = '[[${selectedContactName}]]';
 
             if (!selectedContactId || !selectedContactName) {
                 setDefaultState();
@@ -278,132 +480,144 @@
     });
 
     function setDefaultState() {
-        document.getElementById('activeContactName').textContent = 'Please select a contact to start chatting';
+        document.getElementById('activeContactName').textContent = 'Select a conversation';
         document.getElementById('messageForm').querySelector('button').disabled = true;
-        document.querySelector('.contacts-list').style.display = 'block';
+        document.getElementById('messageContent').disabled = true;
     }
 
     function initializeChat(contactId, contactName) {
         document.getElementById('activeContactName').textContent = contactName;
         document.getElementById('receiverId').value = contactId;
         loadMessages(contactId);
-        document.querySelector('.contacts-list').style.display = 'none';
         enableChatElements();
         markMessagesAsSeen(contactId);
+
+        // Highlight active contact
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('data-id') === contactId) {
+                item.classList.add('active');
+            }
+        });
     }
 
     function selectConversation(element) {
-        const activeContactName = element.querySelector("span:nth-child(2)").textContent;
-        document.getElementById('activeContactName').textContent = activeContactName;
-
         const contactId = element.getAttribute('data-id');
+        const contactName = element.querySelector("span:first-child").textContent;
+
+        // Update UI
+        document.getElementById('activeContactName').textContent = contactName;
         document.getElementById('receiverId').value = contactId;
+
+        // Highlight selected contact
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        element.classList.add('active');
 
         loadMessages(contactId);
         enableChatElements();
-
         markMessagesAsSeen(contactId);
     }
 
     function enableChatElements() {
-        document.getElementById('messageForm').querySelector('button').disabled = false; // Enable Send button
-        document.getElementById('messageContent').disabled = false; // Enable textarea
+        document.getElementById('messageForm').querySelector('button').disabled = false;
+        document.getElementById('messageContent').disabled = false;
+        document.getElementById('messageContent').focus();
     }
 
     function loadMessages(userId) {
         const url = `/messages/user/${userId}`;
+        const messageList = document.getElementById('messageList');
+
+        // Show loading state
+        messageList.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                <p>Loading messages...</p>
+            </div>
+        `;
 
         fetch(url)
-            .then(response => handleFetchResponse(response))
-            .then(data => displayMessages(data))
-            .catch(error => handleErrorLoadingMessages(error));
-    }
-
-    function handleFetchResponse(response) {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayMessages(data);
+            })
+            .catch(error => {
+                console.error("Error loading messages:", error);
+                messageList.innerHTML = `
+                    <div class="error-message" style="text-align: center; padding: 2rem; color: var(--error-color);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Unable to load messages. Please try again later.</p>
+                    </div>
+                `;
+            });
     }
 
     function displayMessages(data) {
-         const messageList = document.getElementById('messageList');
+        const messageList = document.getElementById('messageList');
         messageList.innerHTML = '';
 
         if (data && data.length > 0) {
-            data.forEach(message => appendMessage(message, messageList));
+            data.forEach(message => {
+                appendMessage(message, messageList);
+            });
         } else {
-            messageList.innerHTML = '<p>No messages yet. Start a conversation!</p>';
+            messageList.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <i class="fas fa-comment-slash" style="font-size: 2rem;"></i>
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
+            `;
         }
 
+        // Scroll to bottom
         messageList.scrollTop = messageList.scrollHeight;
-
     }
 
+    function appendMessage(message, messageList) {
+        const messageElement = document.createElement('div');
+        const isSent = message.senderId === document.getElementById('senderId').value;
 
-     function appendMessage(message, messageList) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add(
-        message.senderId === document.getElementById('senderId').value
-            ? 'message-sent'
-            : 'message-received'
-    );
+        messageElement.classList.add(isSent ? 'message-sent' : 'message-received');
+        messageElement.style.animationDelay = `${messageList.children.length * 0.05}s`;
 
-    let seenStatusHTML = '';
-    if (message.senderId === document.getElementById('senderId').value && message.seen) {
-        const seenTime = new Date(message.seenTime);
-        const formattedTime = seenTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const today = new Date();
-        const isToday = seenTime.toDateString() === today.toDateString();
-
-        if (isToday) {
+        let seenStatusHTML = '';
+        if (isSent && message.seen) {
+            const seenTime = new Date(message.seenTime);
+            const formattedTime = seenTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             seenStatusHTML = `
-                <div class="seen-status-container">
-                    <span class="seen-status">Seen</span>
-                    <span class="seen-time">${formattedTime}</span>
-                </div>
-            `;
-        } else {
-            const formattedDate = seenTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
-            seenStatusHTML = `
-                <div class="seen-status-container">
-                    <span class="seen-status">Seen</span>
-                    <span class="seen-time">${formattedDate} at ${formattedTime}</span>
+                <div class="seen-status">
+                    <i class="fas fa-check-double"></i>
+                    <span>Seen ${formattedTime}</span>
                 </div>
             `;
         }
-    }
 
-    const sentTimestampHTML = `
-        <span class="sent-timestamp">Sent at ${new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-    `;
+        const timestamp = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    const receivedTimestampHTML = `
-        <span class="received-timestamp">${new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-    `;
+        messageElement.innerHTML = `
+            <div class="message-bubble">${message.content}</div>
+            <div class="timestamp">
+                ${timestamp}
+                ${seenStatusHTML}
+            </div>
+        `;
 
-    messageElement.innerHTML = `
-        <p>${message.content}</p>
-        ${message.senderId === document.getElementById('senderId').value ? sentTimestampHTML : receivedTimestampHTML}
-        ${seenStatusHTML}
-    `;
-
-    messageList.appendChild(messageElement);
-}
-
-
-
-    function handleErrorLoadingMessages(error) {
-        console.error("Error loading messages:", error);
-        const messageList = document.getElementById('messageList');
-        messageList.innerHTML = `<p class="error-message">Unable to load messages. Please try again later.</p>`;
+        messageList.appendChild(messageElement);
     }
 
     document.getElementById('messageForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const messageContent = document.getElementById('messageContent').value;
+        const messageContent = document.getElementById('messageContent').value.trim();
+        if (!messageContent) return;
+
         const senderId = document.getElementById('senderId').value;
         const receiverId = document.getElementById('receiverId').value;
 
@@ -411,6 +625,24 @@
     });
 
     function sendMessage(content, senderId, receiverId) {
+        // Show sending state
+        const messageList = document.getElementById('messageList');
+        const tempMessage = document.createElement('div');
+        tempMessage.classList.add('message-sent');
+        tempMessage.innerHTML = `
+            <div class="message-bubble">${content}</div>
+            <div class="timestamp">
+                Sending...
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+        `;
+        messageList.appendChild(tempMessage);
+        messageList.scrollTop = messageList.scrollHeight;
+
+        // Clear input
+        document.getElementById('messageContent').value = '';
+
+        // Send to server
         const messageData = { content, senderId, receiverId };
 
         fetch('/messages/send', {
@@ -420,67 +652,54 @@
             },
             body: JSON.stringify(messageData)
         })
-            .then(response => handleSendMessageResponse(response))
-            .catch(error => handleErrorSendingMessage(error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to send message');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remove temp message and add real one
+            messageList.removeChild(tempMessage);
+            appendMessage(data, messageList);
+            messageList.scrollTop = messageList.scrollHeight;
+        })
+        .catch(error => {
+            console.error("Error sending message:", error);
+            tempMessage.querySelector('.timestamp').innerHTML = `
+                Failed to send
+                <i class="fas fa-exclamation-circle" style="color: var(--error-color);"></i>
+            `;
+        });
     }
-
-
-   function handleSendMessageResponse(response) {
-        return response.json().then((data) => {
-            displaySentMessage(data);
-            loadMessages(data.receiverId);
-
-            });
-        }
-
-
-    function handleErrorSendingMessage(error) {
-        console.error("Error sending message:", error);
-        alert("There was an error sending the message. Please try again.");
-    }
-
-
-
-   function displaySentMessage(data) {
-    document.getElementById('messageContent').value = '';
-
-    const messageList = document.getElementById('messageList');
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message-sent');
-    messageElement.innerHTML = `
-        <div class="message-content">
-            <p>${data.content}</p>
-            <div class="sent-timestamp">${new Date().toLocaleTimeString('en-US')}</div>
-        </div>
-    `;
-    messageList.appendChild(messageElement);
-
-    messageList.scrollTop = messageList.scrollHeight;
-}
-
-
-
 
     function markMessagesAsSeen(contactId) {
         const messageList = document.getElementById('messageList');
-        const messages = messageList.querySelectorAll('.message-received, .message-sent');
-
+        const messages = messageList.querySelectorAll('.message-received');
 
         messages.forEach(message => {
             const messageId = message.getAttribute('data-message-id');
-            if (messageId && !message.querySelector('.seen-status')) {
+            if (messageId) {
                 fetch(`/messages/seen/${messageId}`, {
                     method: 'PUT',
                 })
-                .then(response => response.json())
-                .then(() => loadMessages(contactId))
                 .catch(error => console.error('Error marking message as seen:', error));
             }
+        });
+    }
+
+    function showTypingIndicator() {
+        document.getElementById('typingIndicator').classList.add('active');
+    }
+
+    function hideTypingIndicator() {
+        document.getElementById('typingIndicator').classList.remove('active');
+    }
+
+
+    document.getElementById('messageContent').addEventListener('input', function() {
+
     });
-}
-
 </script>
-
-
 </body>
 </html>

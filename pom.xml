@@ -104,6 +104,12 @@
         <artifactId>slf4j-api</artifactId>
     </dependency>
 
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>22.13.0</version>
+		</dependency>
+
     <!-- Logging implementation (e.g., Logback) -->
     <dependency>
         <groupId>ch.qos.logback</groupId>

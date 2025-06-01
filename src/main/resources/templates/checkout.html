@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="/static/css/animations.css">
     <style>
-        /* Add your CSS styles here */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
@@ -95,6 +94,57 @@
         .btn:hover {
             background-color: #1d4ed8;
         }
+
+        #payment-element {
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        #payment-errors {
+            color: #dc3545;
+            margin: 1rem 0;
+        }
+
+        #submit-payment {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-payment:hover {
+            background-color: #1d4ed8;
+        }
+
+        #submit-payment:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -104,23 +154,182 @@
         <img th:src="${product.imageUrls[0]}" alt="Product Image" class="product-image">
         <div class="product-info">
             <h2 class="product-name" th:text="${product.name}">Product Name</h2>
-            <p class="product-price">Price: $<span th:text="${product.discountedPrice}">0.00</span></p>
+            <p class="product-price">Price: $<span id="unit-price" th:text="${product.discountedPrice != null ? product.discountedPrice : product.price}">0.00</span></p>
             <p class="product-quantity">Quantity Available: <span th:text="${product.quantity}">0</span></p>
         </div>
     </div>
 
-    <form th:action="@{/checkout/confirm}" method="post" class="checkout-form">
-        <input type="hidden" th:name="productId" th:value="${product.id}">
+    <form id="payment-form">
+        <input type="hidden" id="productId" th:value="${product.id}">
         <div class="form-group">
             <label for="quantity">Quantity</label>
             <input type="number" id="quantity" name="quantity" min="1" th:max="${product.quantity}" required>
         </div>
         <div class="form-group">
-            <label for="shippingAddress">Shipping Address</label> 
+            <label for="shippingAddress">Shipping Address</label>
             <input type="text" id="shippingAddress" name="shippingAddress" required>
         </div>
-        <button type="submit" class="btn">Confirm Purchase</button>
+
+        <!-- Stripe Payment Element -->
+        <div id="payment-element">
+            <!-- Stripe will inject the Payment Element here -->
+        </div>
+        <div id="payment-errors" role="alert"></div>
+        <button id="submit-payment">
+            <span id="button-text">Pay $<span id="total-amount">0.00</span></span>
+            <span id="payment-spinner" class="spinner hidden"></span>
+        </button>
     </form>
 </div>
+
+<!-- Add Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+<script th:inline="javascript">
+    const stripePublishableKey =  "pk_test_51PqEawGbT47XmQSZDKhbVtSJxo3Y3rRUDOzHztVG9rZEgjWoL2gAgxtlhsL1YGhhPpqmc3S2Mj3zs71jfnDBXg5s003qGSAPrr";
+    const stripe = Stripe(stripePublishableKey);
+    let elements;
+    let paymentIntentClientSecret;
+    let orderId;
+    let isPaymentElementMounted = false;
+
+    // Calculate total amount when quantity changes
+    document.getElementById('quantity').addEventListener('change', updateTotalAmount);
+
+    function updateTotalAmount() {
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const unitPrice = parseFloat(document.getElementById('unit-price').textContent);
+        const totalAmount = (quantity * unitPrice).toFixed(2);
+        document.getElementById('total-amount').textContent = totalAmount;
+    }
+
+    // Initialize Stripe Elements when shipping address is entered
+    document.getElementById('shippingAddress').addEventListener('blur', function() {
+        if (!isPaymentElementMounted && this.value.trim() !== '') {
+            initializePaymentElement();
+        }
+    });
+
+    async function initializePaymentElement() {
+        const productId = document.getElementById('productId').value;
+        const quantity = document.getElementById('quantity').value;
+        const shippingAddress = document.getElementById('shippingAddress').value;
+
+        try {
+            const response = await fetch('/checkout/create-payment-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    productId: productId,
+                    quantity: quantity,
+                    shippingAddress: shippingAddress
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to create payment intent');
+            }
+
+            const { clientSecret, orderId: oid } = await response.json();
+            paymentIntentClientSecret = clientSecret;
+            orderId = oid;
+
+            // Set up Stripe Elements
+            const appearance = {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#2563eb',
+                    colorBackground: '#ffffff',
+                    colorText: '#1f2937',
+                    fontFamily: 'Inter, sans-serif'
+                }
+            };
+
+            elements = stripe.elements({ appearance, clientSecret });
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+            isPaymentElementMounted = true;
+
+            // Update total amount on page load
+            updateTotalAmount();
+        } catch (err) {
+            showError(err.message);
+        }
+    }
+
+    // Handle form submission
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        if (!isPaymentElementMounted) {
+            showError('Please complete all fields first');
+            return;
+        }
+
+        // Disable button and show spinner
+        document.getElementById('submit-payment').disabled = true;
+        document.getElementById('payment-spinner').classList.remove('hidden');
+        document.getElementById('button-text').classList.add('hidden');
+
+        try {
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                     return_url: `${window.location.origin}/orders/details/${orderId}`,
+                    receipt_email: /*[[${buyer.email}]]*/ ''
+                },
+                redirect: 'if_required'
+            });
+
+            if (error) {
+                showError(error.message);
+                document.getElementById('submit-payment').disabled = false;
+                document.getElementById('payment-spinner').classList.add('hidden');
+                document.getElementById('button-text').classList.remove('hidden');
+                return;
+            }
+
+            // Confirm payment with our backend
+            const confirmation = await fetch('/checkout/confirm-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    paymentIntentId: paymentIntent.id,
+                    orderId: orderId
+                })
+            });
+
+            if (!confirmation.ok) {
+                throw new Error('Payment confirmation failed');
+            }
+
+            window.location.href = `/orders/details/${orderId}`;
+        } catch (err) {
+            showError(err.message || 'Payment processing failed');
+            document.getElementById('submit-payment').disabled = false;
+            document.getElementById('payment-spinner').classList.add('hidden');
+            document.getElementById('button-text').classList.remove('hidden');
+        }
+    }
+
+    function showError(message) {
+        const errorElement = document.getElementById('payment-errors');
+        errorElement.textContent = message;
+        setTimeout(() => errorElement.textContent = '', 5000);
+    }
+
+    // Initialize when page loads
+    window.onload = function() {
+        // Set up form submission
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', handleSubmit);
+    };
+</script>
 </body>
 </html>
