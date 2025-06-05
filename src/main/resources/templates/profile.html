@@ -21,12 +21,13 @@
                 <span class="bar"></span>
             </div>
             <ul class="navbar-nav">
-                <li><a href="/buyerdashboard" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
-                <li><a th:href="@{/products_for_buy}"  class="nav-link"><i class="fas fa-box-open"></i> Products</a></li>
-                <li><a th:href="@{/order_history}" class="nav-link"<i class="fas fa-shopping-bag"></i>> Orders</a></li>
-                <li><a th:href="@{/profile}" class="nav-link"><i clas<i class="fas fa-order"></i>s="fas fa-user"></i> Profile</a></li>
+                <li><a href="/buyerdashboard" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+                <li><a th:href="@{/products_for_buy}" class="nav-link"><i class="fas fa-box-open"></i> Products</a></li>
+                <li><a th:href="@{/orders/history}" class="nav-link"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                <li><a th:href="@{/profile}" class="nav-link active"><i class="fas fa-user"></i> Profile</a></li>
                 <li><a th:href="@{/logout}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
+
         </div>
     </nav>
 
@@ -45,8 +46,8 @@
                 <ul class="profile-nav">
                     <li><a href="/profile" class="active"><i class="fas fa-user"></i> Profile Information</a></li>
                     <li><a href="/orders/history"><i class="fas fa-shopping-bag"></i> My Orders</a></li>
-                    <li><a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
-                    <li><a href="/settings"><i class="fas fa-cog"></i> Account Settings</a></li>
+                    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+<!--                    <li><a href="/settings"><i class="fas fa-cog"></i> Account Settings</a></li>-->
                 </ul>
             </div>
 

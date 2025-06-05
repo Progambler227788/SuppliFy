@@ -559,7 +559,7 @@
     </div>
 
     <!-- Rating Section -->
-    <div class="rating-section" th:unless="${order.rating != null}">
+    <div class="rating-section" th:if="${order.status == 'DELIVERED' and order.rating == null}">
       <h3>Rate Your Purchase</h3>
       <form class="rating-form" th:action="@{/ratings/submit}" method="post">
         <input type="hidden" name="orderId" th:value="${order.id}" />

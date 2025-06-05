@@ -11,6 +11,7 @@ import com.supplify.dto.StripeIntentResponse;
 import com.supplify.entity.Payment;
 import com.supplify.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,7 +20,8 @@ import java.util.Map;
 @Service
 public class PaymentService {
 
-    private String stripeApiKey = ""; // Set your Stripe API key here
+    private String stripeApiKey = "sk_test_51PqEawGbT47XmQSZttVAio0ynbLP0hmiUeC20Jj3syPWPURYKW0PuC9NEjOf5iMP1ujs8T6QSxWrmX9lPaW67uCv000ingu8Lr";
+
 
     @Autowired
     private PaymentRepository paymentRepository;

@@ -1,6 +1,7 @@
 package com.supplify.controller;
 
 import com.supplify.entity.Product;
+import com.supplify.entity.Rating;
 import com.supplify.entity.Seller;
 import com.supplify.repository.SellerRepository;
 import com.supplify.service.Implement.ProductServiceImpl;
@@ -29,6 +30,7 @@ public class ProductController {
 
     @Autowired
     private SellerRepository sellerRepository;
+
 
     /**
      * List products for the logged-in seller

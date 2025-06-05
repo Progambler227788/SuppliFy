@@ -1,8 +1,13 @@
 package com.supplify.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.time.format.DateTimeFormatter;
 
+import com.supplify.entity.Rating;
+import com.supplify.repository.RatingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.supplify.dto.BuyerDto;
-import com.supplify.enm.BuyerType;
+import com.supplify.dto.BuyerDto;;
 import com.supplify.entity.Buyer;
 import com.supplify.entity.Product;
 import com.supplify.repository.BuyerRepository;
@@ -41,6 +45,12 @@ public class BuyerController {
 	private final BuyerService buyerService;
 	@Autowired
 	private ProductServiceImpl productServiceImpl;
+
+	@Autowired
+	private RatingRepository ratingRepository;
+
+
+
 	@Autowired
 	private BuyerRepository buyerRepository;
 	public BuyerController(BuyerService buyerService,ProductServiceImpl productServiceImpl,BuyerRepository buyerRepository) {
@@ -191,11 +201,24 @@ public class BuyerController {
 			filteredProducts = List.of(); // Empty list if null
 		}
 
+		// ----------  BLOCK FOR REVIEWS MAPPING ----------
+
+		// Map product id to list of ratings for display in the template
+		Map<Long, List<Rating>> productRatingsMap = new HashMap<>();
+		for (Product product : filteredProducts) {
+			List<Rating> ratings = ratingRepository.findByProductId(product.getId());
+			productRatingsMap.put(product.getId(), ratings);
+		}
+
+
+		model.addAttribute("productRatingsMap", productRatingsMap);
+
+		// --------------------------------------------------------
+
 		model.addAttribute("products", filteredProducts);
 		model.addAttribute("buyerType", buyerType);
 		return "products_for_buy";
 	}
-
 
 
 

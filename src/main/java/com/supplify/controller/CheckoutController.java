@@ -35,7 +35,7 @@ public class CheckoutController {
     @Autowired
     private PaymentService paymentService;
 
-    private final String stripePublishableKey = "";
+    private final String stripePublishableKey = "pk_test_51PqEawGbT47XmQSZDKhbVtSJxo3Y3rRUDOzHztVG9rZEgjWoL2gAgxtlhsL1YGhhPpqmc3S2Mj3zs71jfnDBXg5s003qGSAPrr";
 
     @GetMapping("/{productId}")
     public String showCheckoutPage(@PathVariable Long productId, Model model, Authentication authentication) {
