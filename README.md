@@ -56,7 +56,7 @@ A full-featured e-commerce platform with role-based access for buyers, sellers, 
 1. Clone the project:
 
    ```bash
-   git clone https://github.com/your-username/your-repo.git
+   git clone https://github.com/Progambler227788/SuppliFy.git
    cd your-repo
    ```
 
