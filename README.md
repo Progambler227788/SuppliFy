@@ -4,9 +4,9 @@ A full-featured e-commerce platform with role-based access for buyers, sellers, 
 
 ---
 
-### 🎥 Demo
+### 🎥 Live Demo
 
-[https://github.com/Progambler227788/SuppliFy/Ecommerce.mp4](https://github.com/Progambler227788/SuppliFy/Ecommerce.mp4)
+🔗 Watch on YouTube: https://youtu.be/s5e9dk9un4g
 
 ---
 
